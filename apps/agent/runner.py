@@ -181,7 +181,8 @@ def _reserve_daily_message() -> dict[str, Any] | None:
         usage = AgentDailyUsage.objects.select_for_update().get(pk=usage.pk)
         if usage.messages_used >= limit:
             return {
-                "error": "daily_limit", "limit": limit, "used": usage.messages_used,
+                "error": "daily_limit", "limit": limit,
+            "used": usage.messages_used,
                 "remaining": 0, "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
             }
         usage.messages_used += 1

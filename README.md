@@ -110,9 +110,11 @@ This only creates a device session, reads ConfigBasic and checks MCP. It does
 **not** request an OTP, debit a wallet or pay a bill. Complete fresh login and a
 real inquiry manually using the guide. Never reuse a captured HAR OTP.
 
-For a real payment, configure `P24_PAYMENT_CALLBACK` with a valid callback owned
-by your installation and accepted by Core. A localhost placeholder cannot
-establish payment validity or reachability from an external provider.
+For a real payment, leave `P24_PAYMENT_CALLBACK=` empty to use Core's native
+return page. A custom callback must be allowed by Core; the local MCP address
+is not automatically allowed. This does not change verification or settlement:
+after browser IPG, reconcile the returned PaymentKey with `p24_payment_status`.
+See [payment callback configuration and recovery](docs/payment-callback.md).
 
 ## Agent and MCP clients
 

@@ -148,10 +148,15 @@ The site may charge for an inquiry. Do not treat demo fee values as real prices.
 
 ## 7. Payment and webhook acceptance
 
-Configure P24_PAYMENT_CALLBACK to the legitimate URL accepted by Core for this
-installation. Select a gateway returned by current PaymentChannels. For bill
-payment, supply the original Service (or the matching request_id for electricity
-or water). Do not use Query.UniqueID as a BillUniqueID.
+For the local test, keep `P24_PAYMENT_CALLBACK=` empty in `.env`. Core accepts
+an empty callback and has its own return page. A nonempty custom callback must
+be allowed by Core; do not substitute localhost:8000 or a random public URL.
+Select a gateway returned by current PaymentChannels. For bill payment, supply
+the original Service (or the matching request_id for electricity or water).
+Do not use Query.UniqueID as a BillUniqueID. An old local
+CALLBACK_NOT_CONFIGURED reservation with no upstream calls can resume once
+with the same inputs; do not delete operations or change bill IDs to retry.
+See [callback configuration and recovery](payment-callback.md).
 
 For IPG complete RedirectLink, then call p24_payment_status with the returned
 PaymentKey. `Paid` does not mean `Settle`; inspect individual bill statuses.

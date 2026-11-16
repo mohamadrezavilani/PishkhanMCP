@@ -9,9 +9,10 @@ import json
 
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 
 from apps.core.errors import PishkhanError
-from apps.core.models import Operation, PaymentAttempt, Quote
+from apps.core.models import Operation, PaymentAttempt, ProviderCall, Quote
 from apps.core.tracing import current_request, ensure_request
 from apps.providers.registry import find_action
 
@@ -132,7 +133,13 @@ def _finish_start(session, result, gateway):
         )
     key = data["PaymentKey"]
     flow = gateway_flow(gateway)
-    payload = {**result, "payment_key": key, "payment_flow": flow, "financial_state": "unknown"}
+    payload = {
+        **result,
+        "payment_key": key,
+        "payment_flow": flow,
+        "financial_state": "unknown",
+        "callback_mode": "custom" if (settings.P24_PAYMENT_CALLBACK or "").strip() else "core_default",
+    }
     if flow == "wallet":
         ops.live_call(session, find_action("WalletPayment", "core"), {"PaymentKey": key})
         try:
@@ -168,10 +175,8 @@ def pay_quote(session_id, quote_id, gateway, use_credit, idempotency_key):
     if not channels:
         return ops.quote_dict(quote)
     require_gateway(gateway, channels)
-    if not settings.P24_PAYMENT_CALLBACK:
-        raise PishkhanError("CALLBACK_NOT_CONFIGURED", "Configure P24_PAYMENT_CALLBACK.")
     wire = {
-        "Callback": settings.P24_PAYMENT_CALLBACK,
+        "Callback": (settings.P24_PAYMENT_CALLBACK or "").strip(),
         "Gateway": gateway,
         "PurchaseKey": quote.parameters["purchase_key"],
         "UseCredit": use_credit,
@@ -201,6 +206,55 @@ def pay_quote(session_id, quote_id, gateway, use_credit, idempotency_key):
     )
 
 
+def _resume_callback_preflight(session, key, parameters, executor):
+    """Reclaim only the old local callback guard, never an attempted payment.
+
+    Prior versions reserved bill_payment before raising CALLBACK_NOT_CONFIGURED.
+    That exact preflight ran before any Core call. A conditional UPDATE lets only
+    one worker reclaim a matching reservation; a crash leaves RUNNING/UNKNOWN
+    non-retryable. Retain the original operation/request IDs. Changing the subject,
+    gateway, or service still follows execute_once's idempotency conflict rules.
+    """
+    from apps.core import operations as ops
+
+    operation = (
+        Operation.objects.select_related("session", "request")
+        .filter(session=session, idempotency_key=key, action_id="bill_payment")
+        .first()
+    )
+    if not operation or operation.status != Operation.Status.FAILED:
+        return None
+    error = operation.result.get("error", {}) if isinstance(operation.result, dict) else {}
+    if not isinstance(error, dict) or error.get("code") != "CALLBACK_NOT_CONFIGURED":
+        return None
+    raw = json.dumps({"action": "bill_payment", "parameters": parameters}, sort_keys=True, ensure_ascii=False)
+    fingerprint = hashlib.sha256(raw.encode()).hexdigest()
+    if operation.request_hash != fingerprint or operation.request_data != parameters:
+        return None
+    if current_request() and operation.request_id and operation.request_id != current_request().pk:
+        raise PishkhanError("REQUEST_MISMATCH", "This idempotency key belongs to another request.")
+
+    # Keep every guard in the write predicate; checking first and then updating
+    # unconditionally would let two concurrent callers repeat the payment.
+    eligible = (
+        Operation.objects.filter(
+            pk=operation.pk,
+            status=Operation.Status.FAILED,
+            result=operation.result,
+            request_hash=fingerprint,
+            request_data=parameters,
+            upstream_reference="",
+        )
+        .exclude(pk__in=ProviderCall.objects.filter(operation_id=operation.pk).values("operation_id"))
+        .exclude(pk__in=PaymentAttempt.objects.filter(operation_id=operation.pk).values("operation_id"))
+    )
+    claimed = eligible.update(status=Operation.Status.RUNNING, updated_at=timezone.now())
+    operation.refresh_from_db()
+    if not claimed:
+        return ops._operation_response(operation, replayed=True)
+    return ops._complete_operation(operation, executor)
+
+
 def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service_name=None):
     from apps.core import operations as ops
 
@@ -226,8 +280,6 @@ def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service
                 "notice": "No money moved.",
                 "next_step": "p24_demo_complete_payment",
             }
-        if not settings.P24_PAYMENT_CALLBACK:
-            raise PishkhanError("CALLBACK_NOT_CONFIGURED", "Configure P24_PAYMENT_CALLBACK.")
         channels = ops.live_call(
             session, find_action("BillsPaymentChannels", "core"), {"Service": service_name, "Bills": bill_ids}
         )
@@ -235,7 +287,11 @@ def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service
         response = ops.live_call(
             session,
             find_action("BillsPayment", "core"),
-            {"Callback": settings.P24_PAYMENT_CALLBACK, "Gateway": gateway, "Bills": bill_ids},
+            {
+                "Callback": (settings.P24_PAYMENT_CALLBACK or "").strip(),
+                "Gateway": gateway,
+                "Bills": bill_ids,
+            },
         )
         return _finish_start(session, response, gateway)
 
@@ -246,6 +302,10 @@ def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service
         if session.mode == "live"
         else idempotency_key
     )
+    if session.mode == "live":
+        recovered = _resume_callback_preflight(session, key, wire, perform)
+        if recovered is not None:
+            return recovered
     return ops.execute_once(session, "bill_payment", wire, key, perform, service_id=service_id)
 
 

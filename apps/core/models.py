@@ -124,6 +124,7 @@ class SavedItem(models.Model):
 
 class Conversation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    history_version = models.PositiveBigIntegerField(default=0, editable=False)
     session = models.ForeignKey(AccountSession, on_delete=models.CASCADE)
     messages = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)

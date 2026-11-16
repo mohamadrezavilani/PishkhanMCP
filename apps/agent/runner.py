@@ -13,6 +13,7 @@ import httpx
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 from jsonschema import Draft202012Validator
 
@@ -43,7 +44,9 @@ def _make_client() -> httpx.Client:
     if settings.AGENT_WORKSPACE_ID:
         headers["anthropic-workspace-id"] = settings.AGENT_WORKSPACE_ID
     proxy = settings.AGENT_PROXY_URL or None
-    return httpx.Client(timeout=settings.AGENT_TIMEOUT, headers=headers, proxy=proxy, trust_env=not bool(proxy))
+    return httpx.Client(
+        timeout=settings.AGENT_TIMEOUT, headers=headers, proxy=proxy, trust_env=not bool(proxy)
+    )
 
 
 def _error(code: str, message: str, *, retryable: bool = False, **details: Any) -> dict[str, Any]:
@@ -161,13 +164,30 @@ def _execute_tool(
 
 
 def _save_history(conversation: Conversation, messages: list[dict[str, Any]], secrets: set[str]) -> bool:
-    # Optimistic write avoids silently replacing another concurrently completed
-    # turn. Already-issued operations remain available through their IDs.
-    changed = Conversation.objects.filter(pk=conversation.pk, updated_at=conversation.updated_at).update(
-        messages=redact(messages, secrets), updated_at=timezone.now()
-    )
-    return bool(changed)
+    """Atomically replace the history only if its loaded snapshot is still current.
 
+    Wall-clock timestamps can repeat or move backwards, so updated_at is only
+    metadata, never a concurrency token. The revision catches same-content writes;
+    the messages predicate also protects against legacy/admin writers that do not
+    increment it. All application history writers should use this helper.
+    Already-issued tools are not rolled back or automatically replayed on conflict.
+    """
+    saved_messages = redact(messages, secrets)
+    saved_at = timezone.now()
+    changed = Conversation.objects.filter(
+        pk=conversation.pk,
+        history_version=conversation.history_version,
+        messages=conversation.messages,
+    ).update(
+        messages=saved_messages,
+        history_version=F("history_version") + 1,
+        updated_at=saved_at,
+    )
+    if changed:
+        conversation.messages = saved_messages
+        conversation.history_version += 1
+        conversation.updated_at = saved_at
+    return bool(changed)
 
 
 def _reserve_daily_message() -> dict[str, Any] | None:
@@ -181,14 +201,17 @@ def _reserve_daily_message() -> dict[str, Any] | None:
         usage = AgentDailyUsage.objects.select_for_update().get(pk=usage.pk)
         if usage.messages_used >= limit:
             return {
-                "error": "daily_limit", "limit": limit,
-            "used": usage.messages_used,
-                "remaining": 0, "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
+                "error": "daily_limit",
+                "limit": limit,
+                "used": usage.messages_used,
+                "remaining": 0,
+                "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
             }
         usage.messages_used += 1
         usage.save(update_fields=["messages_used", "updated_at"])
         return {
-            "limit": limit, "used": usage.messages_used,
+            "limit": limit,
+            "used": usage.messages_used,
             "remaining": max(0, limit - usage.messages_used),
             "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
         }

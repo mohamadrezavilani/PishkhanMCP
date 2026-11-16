@@ -167,9 +167,12 @@ not mark payment success; it only directs you to authoritative status checking.
 Direct tools and the smoke command work without a model. The console chat needs:
 
 ```dotenv
-AGENT_BASE_URL=https://your-model-provider.example/v1
-AGENT_MODEL=your-tool-capable-model
-AGENT_API_KEY=
+AGENT_BASE_URL=https://api.anthropic.com/v1
+AGENT_MODEL=claude-sonnet-4-6
+AGENT_API_KEY=YOUR_ROTATED_CLAUDE_API_KEY
+AGENT_WORKSPACE_ID=
+AGENT_PROXY_URL=
+AGENT_DAILY_MESSAGE_LIMIT=10
 ```
 
 Use your actual compatible model endpoint and restart the app. A missing model
@@ -179,3 +182,24 @@ model endpoint was used in this review; the agent loop has controlled tests.
 For an external MCP client use `http://127.0.0.1:8000/mcp` locally, or your own
 deployed HTTPS address for a cloud client. This review has not deployed a public
 server. Do not interpret a developer container's loopback URL as remotely hosted.
+
+
+### Claude API and daily budget
+
+The runner calls Anthropic's OpenAI-compatible Chat Completions endpoint at
+`https://api.anthropic.com/v1/chat/completions`. Use a model enabled in your
+Anthropic workspace. For an unscoped personal/service key, set
+`AGENT_WORKSPACE_ID` to the workspace ID from the Claude Console; otherwise
+leave it empty. Anthropic positions this compatibility layer mainly for
+model evaluation; for a long-term production integration, prefer its native
+Messages API.
+
+`AGENT_DAILY_MESSAGE_LIMIT=10` caps the built-in agent at ten user chat turns
+per Tehran-local day across the deployment. Each turn counts once regardless
+of how many tools the model invokes. It resets on the next local day. Manual
+MCP tool calls do not consume this budget.
+
+If the network requires SOCKS5, install the locked socks extra and set
+`AGENT_PROXY_URL=socks5://USERNAME:URL_ENCODED_PASSWORD@HOST:PORT` in the
+local `.env`. This proxy is used only for model API traffic, not Pishkhan Core.
+Do not commit proxy credentials.

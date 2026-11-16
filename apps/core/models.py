@@ -214,3 +214,11 @@ class PaymentAttempt(models.Model):
             "bill_statuses": self.bill_statuses,
             "settled": self.status == "Settle",
         }
+
+
+class AgentDailyUsage(models.Model):
+    """One shared daily message budget for the built-in agent."""
+
+    usage_date = models.DateField(unique=True)
+    messages_used = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)

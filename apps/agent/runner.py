@@ -12,10 +12,11 @@ from urllib.parse import urlsplit
 import httpx
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.utils import timezone
 from jsonschema import Draft202012Validator
 
-from apps.core.models import AccountSession, Conversation
+from apps.core.models import AccountSession, AgentDailyUsage, Conversation
 
 from .prompts import system_prompt
 from .redaction import collect_secrets, redact
@@ -39,7 +40,10 @@ def _make_client() -> httpx.Client:
     headers = {"Content-Type": "application/json"}
     if settings.AGENT_API_KEY:
         headers["Authorization"] = f"Bearer {settings.AGENT_API_KEY}"
-    return httpx.Client(timeout=settings.AGENT_TIMEOUT, headers=headers)
+    if settings.AGENT_WORKSPACE_ID:
+        headers["anthropic-workspace-id"] = settings.AGENT_WORKSPACE_ID
+    proxy = settings.AGENT_PROXY_URL or None
+    return httpx.Client(timeout=settings.AGENT_TIMEOUT, headers=headers, proxy=proxy, trust_env=not bool(proxy))
 
 
 def _error(code: str, message: str, *, retryable: bool = False, **details: Any) -> dict[str, Any]:
@@ -165,6 +169,30 @@ def _save_history(conversation: Conversation, messages: list[dict[str, Any]], se
     return bool(changed)
 
 
+
+def _reserve_daily_message() -> dict[str, Any] | None:
+    """Reserve one user chat turn against the deployment-wide daily budget."""
+    limit = settings.AGENT_DAILY_MESSAGE_LIMIT
+    if not isinstance(limit, int) or not 1 <= limit <= 1000:
+        return {"error": "invalid_limit"}
+    today = timezone.localdate()
+    with transaction.atomic():
+        usage, _ = AgentDailyUsage.objects.get_or_create(usage_date=today)
+        usage = AgentDailyUsage.objects.select_for_update().get(pk=usage.pk)
+        if usage.messages_used >= limit:
+            return {
+                "error": "daily_limit", "limit": limit, "used": usage.messages_used,
+                "remaining": 0, "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
+            }
+        usage.messages_used += 1
+        usage.save(update_fields=["messages_used", "updated_at"])
+        return {
+            "limit": limit, "used": usage.messages_used,
+            "remaining": max(0, limit - usage.messages_used),
+            "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
+        }
+
+
 def run_turn(session_id: str, message: str, conversation_id: str | None = None) -> dict[str, Any]:
     """Execute one user turn and return reply, trace, and continuation identifier.
 
@@ -200,6 +228,13 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
             return _error("conversation_not_found", "گفت‌وگو برای حساب جاری یافت نشد.")
     else:
         conversation = Conversation.objects.create(session=session)
+
+    usage = _reserve_daily_message()
+    if usage and usage.get("error") == "daily_limit":
+        return _error("agent_daily_limit", "سقف روزانهٔ پیام‌های ایجنت تمام شده است؛ فردا دوباره تلاش کنید.",
+                      limit=usage["limit"], used=usage["used"], remaining=0, resets_on=usage["resets_on"])
+    if usage and usage.get("error"):
+        return _error("agent_budget_configuration", "تنظیم سقف مصرف روزانه معتبر نیست.")
 
     registry = {tool["name"]: tool for tool in _list_tools() if tool["name"] not in _SESSION_CREATORS}
     history = deepcopy(conversation.messages)
@@ -324,6 +359,7 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
         "tool_calls": redact(trace, secrets),
         "steps": steps,
         "stop_reason": failure["error"]["code"] if failure else "completed",
+        "agent_usage": usage,
     }
     if failure:
         result["error"] = failure["error"]

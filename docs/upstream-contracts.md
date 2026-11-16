@@ -38,7 +38,7 @@ facility; this does not establish that all services or financial flows work.
 Base URL:
 
 ```text
-https://core.pishkhan24.ayanco.com/webservices/
+https://core.pishkhan24.ayantech.ir/webservices/
 ```
 
 There are three endpoint groups, all using POST JSON:

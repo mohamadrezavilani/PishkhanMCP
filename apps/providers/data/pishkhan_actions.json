@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "reviewed_at": "2026-11-16",
-  "upstream_base_url": "https://core.pishkhan24.ayanco.com/webservices/",
+  "upstream_base_url": "https://core.pishkhan24.ayantech.ir/webservices/",
   "transport": {
     "method": "POST",
     "content_type": "application/json",
@@ -33,8 +33,16 @@
       "action": "core_device_register_v2",
       "identity": "anonymous",
       "status_code": "GR0002",
-      "result": "input validation with the four public runtime fields; no session created",
+      "result": "Historical failed attempt used the incorrect ayanco.com host; source and HAR confirm ayantech.ir is the correct host.",
       "financial_action": false
+    },
+    {
+      "action": "core_device_register_v2",
+      "identity": "anonymous",
+      "status_code": "G00000",
+      "result": "Successful DeviceRegister v2 observed in supplied HAR on core.pishkhan24.ayantech.ir; this is browser evidence, not a fresh MCP replay.",
+      "financial_action": false,
+      "source": "supplied HAR"
     }
   ],
   "actions": [

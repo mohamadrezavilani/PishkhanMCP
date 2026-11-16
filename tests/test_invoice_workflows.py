@@ -148,16 +148,16 @@ def test_preview_then_wallet_payment_cannot_skip_steps(live_session, upstream, s
         )
     assert len(calls) == 2
 
-    responses.extend([{"PaymentKey": "payment-fixture"}, {}])
+    responses.extend([{"PaymentKey": "payment-fixture"}, {}, {"Status": {"Name": "Settle"}, "Bills": []}])
     paid = operations.pay_quote(str(live_session.pk), first["quote_id"], "wallet-fixture", False, "pay")
     assert paid["result"]["quote"]["stage"] == "ready"
-    assert [x[1] for x in calls[-2:]] == ["v1/InvoicePayment", "v1/WalletPayment"]
+    assert [x[1] for x in calls[-3:]] == ["v1/InvoicePayment", "v1/WalletPayment", "v1/PaymentInfo"]
     assert calls[-1][2] == {"PaymentKey": "payment-fixture"}
     again = operations.pay_quote(
         str(live_session.pk), first["quote_id"], "wallet-fixture", False, "other-pay-key"
     )
     assert again["stage"] == "ready"
-    assert len(calls) == 4
+    assert len(calls) == 5
 
 
 def test_gateway_redirect_stays_pending_until_authoritative_result(live_session, upstream, settings):

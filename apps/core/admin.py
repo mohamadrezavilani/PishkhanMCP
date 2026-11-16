@@ -1,6 +1,16 @@
 from django.contrib import admin
 
-from .models import AccountSession, Conversation, Operation, Quote, SavedItem
+from .models import (
+    AccountSession,
+    Conversation,
+    CorrelationEdge,
+    Operation,
+    PaymentAttempt,
+    ProviderCall,
+    Quote,
+    SavedItem,
+    UserRequest,
+)
 
 
 @admin.register(AccountSession)
@@ -16,4 +26,6 @@ class OperationAdmin(admin.ModelAdmin):
     readonly_fields = ["id", "request_hash", "idempotency_key", "result"]
 
 
-admin.site.register([Quote, SavedItem, Conversation])
+admin.site.register(
+    [Quote, SavedItem, Conversation, UserRequest, ProviderCall, CorrelationEdge, PaymentAttempt]
+)

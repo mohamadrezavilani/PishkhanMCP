@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from apps.core.errors import PishkhanError
 from apps.core.models import AccountSession, Operation, Quote
+from apps.core.tracing import current_request, ensure_request, operation_scope, trace_call
 from apps.providers import demo
 from apps.providers.client import PishkhanClient, password_digest, redact
 from apps.providers.registry import find_action, get_action, registry, validate_parameters
@@ -47,9 +48,10 @@ def get_quote(session, quote_id, *, allow_expired=False):
     return quote
 
 
-def execute_once(session, action_id, parameters, idempotency_key, executor, *, service_id=""):
+def execute_once(session, action_id, parameters, idempotency_key, executor, *, service_id="", request=None):
     if not idempotency_key or len(idempotency_key) > 128:
         raise PishkhanError("IDEMPOTENCY_KEY_REQUIRED", "یک idempotency_key ثابت برای این درخواست لازم است.")
+    request = request or ensure_request(session, action_id + ":" + idempotency_key, service_id)
     raw = json.dumps({"action": action_id, "parameters": parameters}, sort_keys=True, ensure_ascii=False)
     fingerprint = hashlib.sha256(raw.encode()).hexdigest()
     # The record is committed before the external side effect. A process crash
@@ -59,6 +61,7 @@ def execute_once(session, action_id, parameters, idempotency_key, executor, *, s
             session=session,
             idempotency_key=idempotency_key,
             defaults={
+                "request": request,
                 "action_id": action_id,
                 "service_id": service_id,
                 "request_hash": fingerprint,
@@ -66,6 +69,8 @@ def execute_once(session, action_id, parameters, idempotency_key, executor, *, s
             },
         )
     if not created:
+        if current_request() and operation.request_id and operation.request_id != current_request().pk:
+            raise PishkhanError("REQUEST_MISMATCH", "This idempotency key belongs to another request.")
         if operation.request_hash != fingerprint:
             raise PishkhanError("IDEMPOTENCY_CONFLICT", "این کلید قبلاً برای ورودی متفاوت استفاده شده است.")
         return _operation_response(operation, replayed=True)
@@ -83,11 +88,14 @@ def _operation_response(operation, *, replayed=False):
 def _complete_operation(operation, executor):
     """Settle an already committed operation reservation without losing its ID."""
     try:
-        result = executor()
+        with operation_scope(operation):
+            result = executor()
         operation.result = redact(result)
         operation.status = (
             Operation.Status.REQUIRES_ACTION
             if result.get("requires_user_action")
+            else Operation.Status.PENDING
+            if result.get("pending")
             else Operation.Status.COMPLETED
         )
     except PishkhanError as exc:
@@ -117,6 +125,7 @@ def _update_account(session, action, parameters, response):
             session.token = token
             if endpoint == "deviceregister":
                 session.device_session = token
+                session.state = "connected"
     if endpoint == "loginbyotp":
         session.phone = parameters.get("Username", session.phone)
         session.state = "authenticated" if parameters.get("OTPCode") else "otp_pending"
@@ -131,7 +140,9 @@ def live_call(session, action, parameters):
     if action.get("requires_session", action.get("requires_auth", False)) and not session.token:
         raise PishkhanError("DEVICE_SESSION_REQUIRED", "ابتدا نشست پیشخوان را ایجاد یا وارد کنید.")
     try:
-        result = PishkhanClient().call(action, parameters, session.token)
+        result = trace_call(
+            session, action, parameters, lambda: PishkhanClient().call(action, parameters, session.token)
+        )
     except PishkhanError as exc:
         if exc.code == "AUTH_REQUIRED":
             session.state = "expired"
@@ -175,10 +186,13 @@ def create_session():
             result.update(session.public_dict())
             result["bootstrap"] = "completed"
         except PishkhanError as exc:
-            result["bootstrap"] = "requires_configuration"
+            network_failure = exc.code in {"UPSTREAM_CONNECTION", "UPSTREAM_TIMEOUT", "UPSTREAM_HTTP"}
+            result["bootstrap"] = "connection_failed" if network_failure else "requires_configuration"
             result["bootstrap_error"] = exc.as_dict()["error"]
             result["next_step"] = (
-                "Supply verified P24_DEVICE_PARAMETERS or use p24_import_session with your own existing Pishkhan session."
+                "Check network/DNS and the configured P24_API_BASE_URL; no login or payment was attempted."
+                if network_failure
+                else "Inspect the upstream status and verified runtime settings; do not guess extra device fields."
             )
     return {"ok": True, **result}
 
@@ -372,10 +386,14 @@ def quote_dict(quote):
     return {
         "ok": True,
         "quote_id": str(quote.pk),
+        "request_id": str(quote.request_id) if quote.request_id else None,
         "mode": quote.session.mode,
         "service_id": quote.service_id,
         "action_id": quote.action_id,
         "amount": quote.amount,
+        "payable": (data.get("Invoice") or {}).get("Payable")
+        if isinstance(data.get("Invoice"), dict)
+        else None,
         "currency": quote.currency,
         "expires_at": quote.expires_at.isoformat(),
         "stage": stage,
@@ -425,7 +443,10 @@ def prepare_inquiry(session_id, action_id, parameters, idempotency_key, service_
         configuration = response.get("parameters")
         if not isinstance(configuration, dict):
             raise PishkhanError("CONFIG_FORMAT", "ساختار تنظیمات خدمت قابل تفسیر نیست.")
+        if configuration.get("Active") is False:
+            raise PishkhanError("SERVICE_DISABLED", "ConfigService marks this service inactive.")
         quote = Quote.objects.create(
+            request=current_request(),
             session=session,
             service_id=next(iter(action.get("service_ids", [])), ""),
             action_id=action_id,
@@ -479,7 +500,13 @@ def resume_inquiry(session_id, quote_id, idempotency_key, otp=None, acknowledge_
         return quote_dict(quote)
 
     return execute_once(
-        session, "resume:" + quote.action_id, request, idempotency_key, perform, service_id=quote.service_id
+        session,
+        "resume:" + quote.action_id,
+        request,
+        idempotency_key,
+        perform,
+        service_id=quote.service_id,
+        request=quote.request,
     )
 
 
@@ -492,6 +519,7 @@ def quote_parcel(session_id, tracking_code, idempotency_key):
 
     def perform():
         quote = Quote.objects.create(
+            request=current_request(),
             session=session,
             service_id="posttracking",
             action_id="demo:posttracking",
@@ -556,6 +584,7 @@ def _claim_inquiry_attempt(session, quote, parameters, idempotency_key, *, retry
             session=session,
             idempotency_key=request_key,
             defaults={
+                "request": current.request,
                 "action_id": quote.action_id,
                 "service_id": quote.service_id,
                 "request_hash": fingerprint,
@@ -655,100 +684,19 @@ def simple_inquiry(session_id, service_id, parameters, idempotency_key):
         )
     if service_id == "freeway":
         endpoint, wire = "FreewayTollBills", {"PlateNumber": parameters["plate"], "OTPCode": None}
-    elif service_id == "electricity":
-        endpoint, wire = "ElectricBills", {"Identifier": parameters["bill_id"]}
+    elif service_id in {"electricity", "water"}:
+        endpoint = "ElectricBills" if service_id == "electricity" else "WaterBills"
+        wire = {"Identifier": parameters["bill_id"]}
     else:
         raise PishkhanError("WORKFLOW_CONTRACT_UNAVAILABLE", "جریان ساده برای این خدمت تعریف نشده است.")
     action = find_action(endpoint, "services")
     return prepare_inquiry(session_id, action["id"], wire, idempotency_key)
 
 
-def _gateway_names(channels):
-    names = set()
-    if not isinstance(channels, list):
-        return names
-    for channel in channels:
-        if not isinstance(channel, dict):
-            continue
-        for gateway in channel.get("Gateways", []) or []:
-            if isinstance(gateway, dict):
-                kind = gateway.get("Type")
-                if isinstance(kind, dict) and isinstance(kind.get("Name"), str):
-                    names.add(kind["Name"])
-    return names
-
-
 def pay_quote(session_id, quote_id, gateway, use_credit, idempotency_key):
-    session = get_session(session_id)
-    quote = get_quote(session, quote_id)
-    if session.mode == "demo":
-        return {
-            "ok": True,
-            "mode": "demo",
-            "quote_id": str(quote.pk),
-            "notice": "پرداخت واقعی در demo انجام نمی‌شود.",
-            "next_step": "p24_run_inquiry",
-        }
-    if quote.parameters.get("stage") not in {"payment_required", "payment_pending", "ready"}:
-        return quote_dict(quote)
-    if quote.parameters.get("payment_completed"):
-        return quote_dict(quote)
-    if not quote.parameters.get("purchase_key"):
-        return quote_dict(quote)
-    channels = _invoice_parameters(quote).get("PaymentChannels", [])
-    if not channels:
-        return quote_dict(quote)
-    gateways = _gateway_names(channels)
-    if gateways and gateway not in gateways:
-        raise PishkhanError(
-            "INVALID_GATEWAY",
-            "درگاه را از گزینه‌های همین صورتحساب انتخاب کنید.",
-            details={"gateways": sorted(gateways)},
-        )
-    if not settings.P24_PAYMENT_CALLBACK:
-        raise PishkhanError(
-            "CALLBACK_NOT_CONFIGURED", "P24_PAYMENT_CALLBACK را با آدرس بازگشت معتبر تنظیم کنید."
-        )
-    wire = {
-        "Callback": settings.P24_PAYMENT_CALLBACK,
-        "Gateway": gateway,
-        "PurchaseKey": quote.parameters["purchase_key"],
-        "UseCredit": use_credit,
-    }
+    from apps.core.payments import pay_quote as pay
 
-    def perform():
-        result = live_call(session, find_action("InvoicePayment", "core"), wire)
-        data = result["parameters"]
-        if not isinstance(data, dict):
-            raise PishkhanError(
-                "PAYMENT_FORMAT", "پاسخ پرداخت قابل تفسیر نیست.", details={"outcome": "unknown"}
-            )
-        quote.parameters["payment_started"] = True
-        quote.parameters["payment"] = data
-        quote.parameters["stage"] = "payment_pending"
-        quote.save(update_fields=["parameters"])
-        if gateway.lower().startswith("wallet"):
-            payment_key = data.get("PaymentKey")
-            if not payment_key:
-                raise PishkhanError(
-                    "PAYMENT_KEY_MISSING", "کلید پرداخت دریافت نشد.", details={"outcome": "unknown"}
-                )
-            result = live_call(session, find_action("WalletPayment", "core"), {"PaymentKey": payment_key})
-            quote.parameters["payment_completed"] = True
-            _set_stage(quote)
-            quote.save(update_fields=["parameters"])
-        else:
-            result["requires_user_action"] = True
-            result["notice"] = (
-                "بازگشت از درگاه به‌تنهایی اثبات پرداخت نیست؛ نتیجهٔ خدمت از پیشخوان دریافت می‌شود."
-            )
-        return {**result, "quote": quote_dict(quote)}
-
-    # One local payment attempt per quote avoids a different model-generated key
-    # initiating a second debit. An uncertain attempt requires reconciliation.
-    return execute_once(
-        session, "pay_quote", wire, f"payment:{quote.pk}", perform, service_id=quote.service_id
-    )
+    return pay(session_id, quote_id, gateway, use_credit, idempotency_key)
 
 
 def invoice_status(session_id, quote_id):

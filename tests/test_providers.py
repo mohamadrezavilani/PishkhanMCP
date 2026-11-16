@@ -102,7 +102,10 @@ def test_registry_has_unique_valid_contracts_and_invoice_nested_json_string():
     for item in items:
         Draft202012Validator.check_schema(item["parameters_schema"])
         assert item["status"] == "source_verified"
-        assert item["evidence"]["source"].startswith("https://pishkhan24.com/")
+        evidence = item["evidence"]
+        assert evidence["kind"] in {"public_javascript", "company_source"}
+        assert len(evidence["sha256"]) == 64
+        assert evidence["source"].startswith(("https://pishkhan24.com/", "core-main/Core/"))
     action = find_action("InvoiceRegister", "services")
     validate_parameters(
         action, {"Service": "v1_InquiryElectricBills", "Parameters": '{"Identifier":"00012"}'}

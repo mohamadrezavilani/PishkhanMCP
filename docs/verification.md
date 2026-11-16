@@ -1,46 +1,37 @@
-# بررسی نسخهٔ اولیه
+# Verification - source/log alignment update
 
-تاریخ: 2026-11-16. محیط محلی: Python 3.12.14، Django 5.2.19، MCP SDK 2.3.0.
+Review date: 2026-11-16. Runtime used: Python 3.13.5, locked dependencies,
+SQLite. Source was obtained through the GitHub offline-bundle artifact because
+this container could not clone from GitHub directly.
 
-## نتایج اجرا
-
-| بررسی | نتیجه |
+| Check | Observed result |
 |---|---|
-| `python -m pytest -q` | 91 passed |
-| `python -m ruff check .` | موفق |
-| `python -m ruff format --check .` | موفق |
-| `python manage.py check` | بدون خطا |
-| `python manage.py makemigrations --check --dry-run` | بدون تغییر ثبت‌نشده |
-| `python manage.py migrate --noinput` | migration اولیه و وابستگی‌های Django اجرا شدند |
-| `python manage.py demo` | ۱۰ مرحله، سه مسیر نمونه، صفر درخواست واقعی |
-| اجرای Uvicorn و فراخوانی HTTP واقعی | health، فهرست ابزارها، استعلام نمایشی و MCP initialize/list موفق |
-| مدیریت فرمان `mcp_stdio` با کلاینت رسمی | فهرست و فراخوانی کاتالوگ موفق |
-| اعتبارسنجی JavaScript پنل | `node --check` موفق |
+| Initial suite before these fixes | 92 passed, 1 failed (taxi expectation) |
+| Updated regression suite | 117 passed |
+| Django system check | No issues |
+| Migration drift check | No changes detected |
+| Migration application including 0002 | Successful |
+| Ruff lint and format | Passed |
+| In-process demo smoke | Passed |
+| Actual Uvicorn GET /, /health/, /api/tools/, /api/services/ | All HTTP 200 |
+| HTTP demo smoke + MCP initialize/list/call | Passed |
+| Fresh live smoke (DeviceRegister only before failure) | UPSTREAM_CONNECTION; exit 1 |
+| Fresh live OTP, paid inquiry, payment and webhook | Not performed |
+| Docker/PostgreSQL execution | Not performed in this container |
+| Real LLM conversation | Not performed; controlled agent-loop tests only |
 
-۳۱ ابزار در رجیستری عمومی ارائه می‌شود. کاتالوگ ۵۶ خدمت دارد و ۱۵۳ عملیات
-upstream از منبع عمومی مشاهده شده‌اند؛ ۵۵ مدخل کاتالوگ حداقل یک نگاشت دارند.
+Successful HTTP smoke check names:
+product_scope, demo_login, distinct_requests_same_session, idempotent_replay,
+demo_payment_receipt, request_trace, http_mcp_initialize_list_call.
+It reported real_otp_sent=false and real_payment_attempted=false.
 
-## دامنهٔ آزمون‌ها
+Regressions cover scope exclusion, separate electricity/water requests, continuity
+across invoice steps, explicit relations without Query.UniqueID confusion,
+active gateway selection, all eight PaymentInfo enum states, Paid vs Settle,
+CNPG payload redaction, unknown payment deduplication, service/session mismatches
+and a forged browser return that cannot change payment state.
 
-آزمون‌ها مذاکرهٔ پروتکل، ساخت و انقضای نشست، OTP و رمز نمایشی، قالب واقعی
-envelope، تبدیل رمز مورد انتظار upstream، ورودی صورتحساب، OTP خدمت بدون
-PurchaseKey، تأیید preview، انتخاب کانال پرداخت، تفاوت redirect و نتیجهٔ واقعی،
-receipt، idempotency، timeout، بازیابی پس از رد قطعی، پاسخ unknown، عدم تغییر
-حساب در گفت‌وگو، انتخاب و فراخوانی ابزار توسط مدل شبیه‌سازی‌شده و APIها را پوشش می‌دهند.
-
-برای تست‌های live-shaped، پاسخ HTTP/upstream کنترل‌شده است. این آزمایش‌ها
-هیچ پیامک، استعلام پولی، برداشت کیف پول یا پرداخت واقعی اجرا نکردند.
-
-## موارد باقی‌مانده برای اعتبارسنجی محیط واقعی
-
-- `DeviceRegister` در بررسی اولیهٔ محدود، `GR0002` برگرداند؛ نشست معتبر شرکت
-  یا نمونهٔ موفق قرارداد ثبت دستگاه لازم است.
-- ورود احرازشده و نتیجهٔ تمام خدمات، هنوز با حساب آزمایشی واقعی بررسی نشده‌اند.
-- حلقهٔ ایجنت با transport مدل کنترل‌شده آزموده شده؛ اتصال مدل انتخاب‌شدهٔ شرکت
-  به `AGENT_BASE_URL` و `AGENT_MODEL` وابسته است.
-- Docker در محیط بررسی موجود نبود؛ فایل‌های استقرار و YAML بررسی شدند، اما
-  image و Compose اجرا نشدند.
-- اجرای مرورگر headless محلی با محدودیت socket محیط مواجه شد؛ بررسی تعاملی و
-  تصویری پنل در مرورگر انجام نشده است. مسیرهای HTTP پنل و نحو JavaScript بررسی شدند.
-
-وضعیت CI روی GitHub مستقل از نتیجهٔ محلی است و از بخش Actions مخزن قابل مشاهده است.
+Captured browser success in the supplied HAR is evidence of that capture, not a
+fresh successful MCP production test. All fixture identities and money examples
+used in tests are synthetic. No private source archive, HAR or log window is
+part of the repository or release ZIP.

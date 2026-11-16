@@ -12,6 +12,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 
 from apps.core.errors import PishkhanError
+from apps.product_scope import EXCLUDED_ENDPOINTS, EXCLUDED_SERVICE_NAMES, SCOPE_NOTE
 
 REGISTRY_PATH = Path(__file__).with_name("data") / "pishkhan_actions.json"
 
@@ -21,7 +22,17 @@ def registry():
     if not REGISTRY_PATH.exists():
         return {"actions": [], "live_observations": []}
     result = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
-    return result if isinstance(result, dict) else {"actions": result}
+    result = result if isinstance(result, dict) else {"actions": result}
+    overrides = json.loads(REGISTRY_PATH.with_name("contract_overrides.json").read_text(encoding="utf-8"))
+    actions = {a["id"]: a for a in result["actions"]}
+    actions.update({a["id"]: a for a in overrides["actions"]})
+    result["actions"] = [a for a in actions.values() if a["path"].split("/")[-1] not in EXCLUDED_ENDPOINTS]
+    result["excluded_service_names"] = list(EXCLUDED_SERVICE_NAMES)
+    result["scope_note"] = SCOPE_NOTE
+    result["bootstrap_source_notes"] = [
+        "The supplied HAR records successful bootstrap on ayantech.ir. It is not a fresh MCP live test and does not prove the sole cause of the earlier failure."
+    ]
+    return result
 
 
 def get_action(action_id):
@@ -67,6 +78,10 @@ def search_actions(query=None, service_id=None, offset=0, limit=20):
 
 
 def validate_parameters(action, parameters):
+    if isinstance(parameters, dict) and parameters.get("Service") in registry().get(
+        "excluded_service_names", []
+    ):
+        raise PishkhanError("SERVICE_NOT_ENABLED", "This service is outside the product scope.")
     schema = action.get("parameters_schema", {"type": "object"})
     invalid = next(Draft202012Validator(schema).iter_errors(parameters), None)
     if invalid:

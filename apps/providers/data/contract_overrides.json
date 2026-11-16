@@ -1,0 +1,285 @@
+{
+  "reviewed_at": "2026-11-16",
+  "actions": [
+    {
+      "id": "core_bills_payment_channels_v1",
+      "group": "core",
+      "path": "v1/BillsPaymentChannels",
+      "title_fa": "BillsPaymentChannels",
+      "description": "Observed website action BillsPaymentChannels. Input schema is partial unless schema_completeness is complete; use the returned upstream prerequisites and invoice/payment flow.",
+      "service_ids": [],
+      "frontend_service_names": [],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "read",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "Service": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Bills": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "Service",
+          "Bills"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "source": "https://pishkhan24.com/_nuxt/Bf3eRQ0O.js",
+        "reviewed_at": "2026-11-16",
+        "kind": "public_javascript",
+        "sha256": "61b07008f9784718e0600828a74052c3bd6b9a91ce573772d0d4f0c06adb1f35"
+      },
+      "parameter_evidence": [
+        {
+          "source": "https://pishkhan24.com/_nuxt/Bf3eRQ0O.js",
+          "fields": [
+            "Bills",
+            "Service"
+          ],
+          "kind": "observed_request_object"
+        }
+      ],
+      "response_notes": "Envelope: Status.Code/Type/Description and Parameters. G00000 success; G00002 session expired. Authenticated behavior has not been tested.",
+      "status": "source_verified"
+    },
+    {
+      "id": "core_device_register_v2",
+      "group": "core",
+      "path": "v2/DeviceRegister",
+      "title_fa": "DeviceRegister",
+      "description": "Observed website action DeviceRegister. Input schema is partial unless schema_completeness is complete; use the returned upstream prerequisites and invoice/payment flow.",
+      "service_ids": [],
+      "frontend_service_names": [],
+      "requires_auth": false,
+      "requires_session": false,
+      "effect": "write",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "Application": {
+            "type": "string"
+          },
+          "Origin": {
+            "type": "string"
+          },
+          "Platform": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Application",
+          "Origin",
+          "Platform",
+          "Version"
+        ],
+        "additionalProperties": true
+      },
+      "schema_completeness": "partial",
+      "evidence": {
+        "source": "https://pishkhan24.com/_nuxt/CpQMm8z7.js",
+        "reviewed_at": "2026-11-16",
+        "kind": "public_javascript",
+        "sha256": "5fd807abfc41ef69afb4c62c8be34f237f222062fb5b34f3f90fd87d9fbe2fd4"
+      },
+      "parameter_evidence": [],
+      "response_notes": "The supplied HAR records successful bootstrap on ayantech.ir with the four runtime fields. The earlier ayanco.com attempt failed; the capture does not prove the sole cause of that earlier rejection. A new MCP run must be tested independently.",
+      "status": "source_verified"
+    },
+    {
+      "id": "services_water_bills_v1",
+      "group": "services",
+      "path": "v1/WaterBills",
+      "title_fa": "قبض آب — WaterBills",
+      "description": "Observed website action WaterBills. Input schema is partial unless schema_completeness is complete; use the returned upstream prerequisites and invoice/payment flow.",
+      "service_ids": [
+        "water"
+      ],
+      "frontend_service_names": [
+        "v1_InquiryWaterBills"
+      ],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "unknown",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "Identifier": {
+            "type": "string",
+            "minLength": 1
+          },
+          "PurchaseKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Identifier",
+          "PurchaseKey"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "source": "https://pishkhan24.com/_nuxt/D-3I8XKG.js",
+        "reviewed_at": "2026-11-16",
+        "kind": "public_javascript",
+        "sha256": "28bb6c537964e3cc17a98ceb3b08c7d688b227e8208db450159b6a77920a2ce9"
+      },
+      "parameter_evidence": [
+        {
+          "source": "https://pishkhan24.com/_nuxt/D-3I8XKG.js",
+          "fields": [
+            "Identifier",
+            "PurchaseKey"
+          ],
+          "kind": "observed_request_object"
+        }
+      ],
+      "response_notes": "Envelope: Status.Code/Type/Description and Parameters. G00000 success; G00002 session expired. Authenticated behavior has not been tested.",
+      "status": "source_verified",
+      "invoice_input_schema": {
+        "type": "object",
+        "properties": {
+          "Identifier": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Identifier"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "core_payment_info_v1",
+      "group": "core",
+      "path": "v1/PaymentInfo",
+      "title_fa": "PaymentInfo",
+      "description": "PaymentInfo: company source contract; successful transport does not prove bill settlement.",
+      "service_ids": [],
+      "frontend_service_names": [],
+      "requires_auth": false,
+      "requires_session": true,
+      "effect": "read",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "PaymentKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "PaymentKey"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "kind": "company_source",
+        "source": "core-main/Core/Intermediate/Modules/Payment/Commands/Info/PaymentInfoModel.cs",
+        "sha256": "de144af7fad9eb6459da1291afbe6c3f61332e6ee8961e736882a85a23c9783b",
+        "reviewed_at": "2026-11-16"
+      },
+      "parameter_evidence": [],
+      "response_notes": "PaymentInfo.Status.Name uses Unknown, Undefined, Unpaid, Paid, InProcess, Settle, Return, Unpayable. CNPG requires session-key encrypted EncryptData from the existing trusted client.",
+      "status": "source_verified"
+    },
+    {
+      "id": "core_cnpg_request_otp_v1",
+      "group": "core",
+      "path": "v1/CnpgRequestOtp",
+      "title_fa": "CnpgRequestOtp",
+      "description": "CnpgRequestOtp: company source contract; successful transport does not prove bill settlement.",
+      "service_ids": [],
+      "frontend_service_names": [],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "write",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "PaymentKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "EncryptData": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "PaymentKey",
+          "EncryptData"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "kind": "company_source",
+        "source": "core-main/Core/Intermediate/Modules/Payment/CNPG/CnpgRequestOtp/CnpgRequestOtpModel.cs",
+        "sha256": "e8cb62bf2d27fce7eb229c5f915052cbc5f46bd2fc0d0d58159b4f72b4865902",
+        "reviewed_at": "2026-11-16"
+      },
+      "parameter_evidence": [],
+      "response_notes": "PaymentInfo.Status.Name uses Unknown, Undefined, Unpaid, Paid, InProcess, Settle, Return, Unpayable. CNPG requires session-key encrypted EncryptData from the existing trusted client.",
+      "status": "source_verified"
+    },
+    {
+      "id": "core_cnpg_payment_v1",
+      "group": "core",
+      "path": "v1/CnpgPayment",
+      "title_fa": "CnpgPayment",
+      "description": "CnpgPayment: company source contract; successful transport does not prove bill settlement.",
+      "service_ids": [],
+      "frontend_service_names": [],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "write",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "PaymentKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "EncryptData": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "PaymentKey",
+          "EncryptData"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "kind": "company_source",
+        "source": "core-main/Core/Intermediate/Modules/Payment/CNPG/CnpgPayment/CnpgPaymentModel.cs",
+        "sha256": "e90252b8743465e7292bd086bfd7d0b1053a6c387c2c51d757917de0920564e6",
+        "reviewed_at": "2026-11-16"
+      },
+      "parameter_evidence": [],
+      "response_notes": "PaymentInfo.Status.Name uses Unknown, Undefined, Unpaid, Paid, InProcess, Settle, Return, Unpayable. CNPG requires session-key encrypted EncryptData from the existing trusted client.",
+      "status": "source_verified"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 from apps.core.errors import PishkhanError
 
 DEMO_OTP = "123456"
-DEMO_SERVICES = {"freeway", "electricity", "posttracking"}
+DEMO_SERVICES = {"freeway", "electricity", "water", "posttracking"}
 
 
 def inquiry(service_id, parameters):
@@ -15,7 +15,7 @@ def inquiry(service_id, parameters):
             "items": [{"route": "مسیر آزمایشی", "amount": 420000}],
             "notice": "این بدهی ساختگی است و هیچ استعلامی از پیشخوان انجام نشده است.",
         }
-    if service_id == "electricity":
+    if service_id in {"electricity", "water"}:
         return {
             "bill_id": parameters["bill_id"],
             "payment_id": "000000000001",

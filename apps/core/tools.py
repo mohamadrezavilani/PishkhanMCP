@@ -7,8 +7,10 @@ from jsonschema import Draft202012Validator
 
 from apps.catalog.catalog import UnknownServiceError, catalog_page, list_categories, service_requirements
 from apps.core import operations as ops
+from apps.core import payments
 from apps.core.errors import PishkhanError
 from apps.core.models import AccountSession, SavedItem
+from apps.core.tracing import ensure_request, request_trace, tool_scope
 from apps.providers import demo
 from apps.providers.client import redact
 from apps.providers.registry import coverage, find_action, get_action, search_actions
@@ -26,13 +28,33 @@ OBJECT = {"type": "object"}
 
 def tool(name, description, properties=None, required=(), *, read_only=False):
     def register(function):
+        props = deepcopy(properties or {})
+        scoped = "session_id" in props and name not in {"p24_begin_request", "p24_request_trace"}
+        if scoped:
+            props["request_id"] = {
+                "type": "string",
+                "minLength": 1,
+                "description": "MCP user-behavior ID; distinct from upstream Core RequestID. Reuse only for this behavior's continuation.",
+            }
+
+        def handler(**arguments):
+            if not scoped:
+                return function(**arguments)
+            arguments = dict(arguments)
+            requested = arguments.pop("request_id", None)
+            with tool_scope(arguments, requested) as request:
+                result = function(**arguments)
+                if request and isinstance(result, dict):
+                    result.setdefault("request_id", str(request.pk))
+                return result
+
         _TOOLS[name] = {
             "definition": {
                 "name": name,
                 "description": description,
                 "inputSchema": {
                     "type": "object",
-                    "properties": properties or {},
+                    "properties": props,
                     "required": list(required),
                     "additionalProperties": False,
                 },
@@ -42,7 +64,7 @@ def tool(name, description, properties=None, required=(), *, read_only=False):
                     "openWorldHint": True,
                 },
             },
-            "handler": function,
+            "handler": handler,
         }
         return function
 
@@ -392,48 +414,13 @@ def run_parcel(session_id, quote_id, idempotency_key):
         "session_id": SESSION,
         "bill_ids": {"type": "array", "items": S, "minItems": 1},
         "gateway": S,
+        "service_name": S,
         "idempotency_key": KEY,
     },
     ["session_id", "bill_ids", "gateway", "idempotency_key"],
 )
-def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key):
-    session = ops.get_session(session_id)
-
-    def perform():
-        if session.mode == "demo":
-            return {
-                "demo": True,
-                "bill_ids": bill_ids,
-                "requires_user_action": True,
-                "notice": "پرداخت نمایشی آماده شده؛ پولی جابه‌جا نشده است.",
-                "next_step": "p24_demo_complete_payment",
-            }
-        if not settings.P24_PAYMENT_CALLBACK:
-            raise PishkhanError("CALLBACK_NOT_CONFIGURED", "P24_PAYMENT_CALLBACK را تنظیم کنید.")
-        result = ops.live_call(
-            session,
-            find_action("BillsPayment", "core"),
-            {"Callback": settings.P24_PAYMENT_CALLBACK, "Gateway": gateway, "Bills": bill_ids},
-        )
-        if gateway.lower().startswith("wallet"):
-            key = result.get("parameters", {}).get("PaymentKey")
-            if not key:
-                raise PishkhanError(
-                    "PAYMENT_KEY_MISSING", "کلید پرداخت دریافت نشد.", details={"outcome": "unknown"}
-                )
-            result = ops.live_call(session, find_action("WalletPayment", "core"), {"PaymentKey": key})
-        else:
-            result["requires_user_action"] = bool(result.get("parameters", {}).get("RedirectLink"))
-        return result
-
-    return ops.execute_once(
-        session,
-        "bill_payment",
-        {"Bills": bill_ids, "Gateway": gateway},
-        idempotency_key,
-        perform,
-        service_id="electricity",
-    )
+def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service_name=None):
+    return payments.prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service_name)
 
 
 @tool(
@@ -561,3 +548,67 @@ def save_item(session_id, service_id, label, data):
     service_requirements(service_id)
     item = SavedItem.objects.create(session=session, service_id=service_id, label=label, data=redact(data))
     return {"item_id": str(item.pk), "scope": "local_project"}
+
+
+@tool(
+    "p24_begin_request",
+    "Start a distinct user behavior under the existing session. Electricity and water need different request IDs; continuation reuses the ID.",
+    {"session_id": SESSION, "service_id": {"type": "string"}, "idempotency_key": KEY},
+    ["session_id", "idempotency_key"],
+)
+def begin_request(session_id, idempotency_key, service_id=""):
+    if service_id:
+        service_requirements(service_id)
+    return ensure_request(ops.get_session(session_id), "begin:" + idempotency_key, service_id).public_dict()
+
+
+@tool(
+    "p24_request_trace",
+    "Inspect this behavior's operations, transport calls and explicit invoice/bill/payment relations. MCP request_id is not Core RequestID.",
+    {"session_id": SESSION, "request_id": S},
+    ["session_id", "request_id"],
+    read_only=True,
+)
+def trace_request(session_id, request_id):
+    return request_trace(session_id, request_id)
+
+
+@tool(
+    "p24_water_bill",
+    "Water bill: demo sample or live invoice workflow. The bill identifier is a string; preserve leading zeroes.",
+    {"session_id": SESSION, "bill_id": S, "idempotency_key": KEY},
+    ["session_id", "bill_id", "idempotency_key"],
+)
+def water_bill(session_id, bill_id, idempotency_key):
+    return ops.simple_inquiry(session_id, "water", {"bill_id": ops.digits(bill_id)}, idempotency_key)
+
+
+@tool(
+    "p24_payment_status",
+    "Read PaymentInfo: Paid is not Settle. Return URLs and successful HTTP responses are not payment proof.",
+    {"session_id": SESSION, "payment_key": S},
+    ["session_id", "payment_key"],
+    read_only=True,
+)
+def payment_status(session_id, payment_key):
+    return payments.payment_status(session_id, payment_key)
+
+
+@tool(
+    "p24_cnpg_request_otp",
+    "Request a CNPG payment OTP using EncryptData encrypted with this session's public key by the existing client. This is not login OTP.",
+    {"session_id": SESSION, "payment_key": S, "encrypted_data": S, "idempotency_key": KEY},
+    ["session_id", "payment_key", "encrypted_data", "idempotency_key"],
+)
+def cnpg_request_otp(session_id, payment_key, encrypted_data, idempotency_key):
+    return payments.cnpg(session_id, payment_key, encrypted_data, idempotency_key)
+
+
+@tool(
+    "p24_cnpg_payment",
+    "Submit the existing CNPG payment using its encrypted card/OTP payload, then reconcile PaymentInfo. Never repeat an unknown payment.",
+    {"session_id": SESSION, "payment_key": S, "encrypted_data": S, "idempotency_key": KEY},
+    ["session_id", "payment_key", "encrypted_data", "idempotency_key"],
+)
+def cnpg_payment(session_id, payment_key, encrypted_data, idempotency_key):
+    return payments.cnpg(session_id, payment_key, encrypted_data, idempotency_key, pay=True)

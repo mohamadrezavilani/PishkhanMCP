@@ -30,8 +30,8 @@ def test_capabilities_executes_and_distinguishes_catalog_from_live_coverage(sett
     settings.P24_MODE = "demo"
     result = call_tool("p24_capabilities", {})
     assert result["ok"]
-    assert result["catalog_service_count"] == 56
-    assert result["demo_services"] == ["electricity", "freeway", "posttracking"]
+    assert result["catalog_service_count"] == 55
+    assert result["demo_services"] == ["electricity", "freeway", "posttracking", "water"]
     assert result["provider"]["source_verified_actions"] > 0
     assert result["provider"]["authenticated_live_validation"] is False
 

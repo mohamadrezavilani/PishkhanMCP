@@ -16,8 +16,8 @@ from apps.catalog.catalog import (
 class CatalogTests(unittest.TestCase):
     def test_full_inventory_is_unique_and_uses_official_sources(self):
         services = list_services()
-        self.assertEqual(len(services), 56)
-        self.assertEqual(len({item["id"] for item in services}), 56)
+        self.assertEqual(len(services), 55)
+        self.assertEqual(len({item["id"] for item in services}), 55)
         for item in services:
             self.assertEqual(urlsplit(item["source_url"]).hostname, "pishkhan24.com")
             self.assertEqual(item["id"], urlsplit(item["source_url"]).path.strip("/"))
@@ -28,7 +28,7 @@ class CatalogTests(unittest.TestCase):
             {item["id"]: item["count"] for item in list_categories()},
             {
                 "social_insurance": 18,
-                "bills": 10,
+                "bills": 9,
                 "vehicles": 15,
                 "mobile": 3,
                 "banking": 4,
@@ -82,12 +82,12 @@ class CatalogTests(unittest.TestCase):
         offset = 0
         while offset is not None:
             page = catalog_page(offset=offset, limit=7)
-            self.assertEqual(page["total"], 56)
+            self.assertEqual(page["total"], 55)
             self.assertLessEqual(page["count"], 7)
             seen.extend(item["id"] for item in page["items"])
             offset = page["next_offset"]
-        self.assertEqual(len(seen), 56)
-        self.assertEqual(len(set(seen)), 56)
+        self.assertEqual(len(seen), 55)
+        self.assertEqual(len(set(seen)), 55)
         with self.assertRaises(ValueError):
             catalog_page(limit=0)
         with self.assertRaises(ValueError):

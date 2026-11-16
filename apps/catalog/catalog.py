@@ -14,6 +14,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from apps.product_scope import EXCLUDED_SERVICES, SCOPE_NOTE
+
 
 class UnknownServiceError(KeyError):
     """The supplied identifier is not a catalog service."""
@@ -30,6 +32,10 @@ def _search_text(value: str) -> str:
 @lru_cache(maxsize=1)
 def _catalog() -> dict[str, Any]:
     payload = json.loads(_DATA_FILE.read_text(encoding="utf-8"))
+    payload["services"] = [s for s in payload["services"] if s["id"] not in EXCLUDED_SERVICES]
+    payload["scope"] = SCOPE_NOTE
+    for category in payload["categories"]:
+        category["count"] = sum(s["category"] == category["id"] for s in payload["services"])
     services = payload["services"]
     identifiers = [service["id"] for service in services]
     if len(identifiers) != len(set(identifiers)):

@@ -9,6 +9,11 @@ from django.conf import settings
 from apps.core.errors import PishkhanError
 
 SENSITIVE_KEYS = {
+    "encryptdata",
+    "pin",
+    "cvv2",
+    "pan",
+    "cardnumber",
     "password",
     "otpcode",
     "otp",
@@ -101,4 +106,8 @@ class PishkhanClient:
                 details={"upstream_code": status.get("Code"), "upstream_type": status.get("Type")},
             )
         parameters = payload.get("Parameters")
-        return {"status": status, "parameters": {} if parameters is None else parameters}
+        result = {"status": status, "parameters": {} if parameters is None else parameters}
+        upstream_id = payload.get("RequestID") or response.headers.get("RequestID")
+        if isinstance(upstream_id, str) and upstream_id:
+            result["upstream_request_id"] = upstream_id
+        return result

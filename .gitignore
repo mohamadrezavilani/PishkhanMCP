@@ -17,3 +17,8 @@ dist/
 build/
 .DS_Store
 *.log
+
+*.har
+private_inputs/
+logs_*.json.gz
+Viewer_Capacity_Inputs_*.zip

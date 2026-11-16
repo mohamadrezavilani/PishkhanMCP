@@ -1,105 +1,31 @@
-# اعتبارسنجی اتصال واقعی پیشخوان
+# Live acceptance
 
-## وضعیت مبنا — ۲۰۲۶/۱۱/۱۶
+First pass the demo and local HTTP/MCP checks in [run-and-test.md](run-and-test.md).
+Changing `.env` does not change existing AccountSession.mode; restart the server
+and create a new session.
 
-| مورد | شاهد موجود | نتیجه |
-|---|---|---|
-| کاتالوگ | صفحات عمومی پیشخوان | ۵۶ مدخل خدمت استخراج شده است |
-| قراردادهای API | JavaScript عمومی با آدرس منبع و تاریخ بررسی | ۱۵۵ endpoint مشاهده شده؛ schemaهای زیادی جزئی‌اند |
-| `ConfigBasic` بدون token | پاسخ مستقیم upstream | `G00002`؛ نشست معتبر لازم است |
-| `DeviceRegister v2` با چهار فیلد runtime عمومی | HAR + سورس شرکت | `G00000`؛ نشست ایجاد شده است |
-| ورود OTP | HAR + handler C# | درخواست و تأیید در HAR موفق‌اند |
-| پرداخت و استعلام پولی | orchestration و قراردادهای مشاهده‌شده | تراکنش واقعی انجام نشده است |
+1. Set the observed API host and P24_MODE=live. Run `smoke_test --live` (with
+   `--base-url` for a running server). It performs only DeviceRegister/ConfigBasic.
+2. Request a fresh login OTP for your own test account and verify it in the same
+   session. A captured HAR OTP is not reusable.
+3. Run one electricity inquiry with a valid identifier. Follow the actual
+   quote stage: acknowledgement, service OTP, preview, active payment channel
+   if required, then result. Record Request/Operation/Call IDs and the returned
+   invoice/bill identifiers locally. Do not assume an inquiry is free.
+4. Run a water inquiry in the same session. Its request_id must differ from
+   electricity; each continuation must retain its own request_id.
+5. Test a specifically approved payment in the company's test environment:
+   select the returned active gateway, complete the provider flow, then query
+   p24_payment_status with its PaymentKey. Inspect Paid vs Settle and individual
+   bill states. A successful return URL is not sufficient.
+6. For CNPG, use the existing client's valid session-encrypted EncryptData;
+   test OTP and payment separately. This repository does not yet provide the
+   card-entry/encryption UI. Do not retry an unknown payment outcome.
+7. Confirm the Core webhook/reconciliation path using the company's controlled
+   provider test setup, not by letting the agent forge a webhook.
+8. Test concurrency on PostgreSQL, provider failures and recovery before use by
+   multiple live users. The local regression run used SQLite.
 
-HAR ارائه‌شده یک جریان موفق DeviceRegister، ورود OTP و استعلام قبض برق را ثبت می‌کند. این شواهد مربوط به اجرای وب‌سایت است، نه اجرای دوباره از MCP. HAR شامل داده‌های حساس حساب است و در مخزن ذخیره نشده است. پرداخت درگاه در HAR وجود ندارد.
-
-## وضعیت bootstrap پس از بررسی سورس و HAR
-
-سورس شرکت در `Core/Main/ProjectValues.cs` host مجاز `core.pishkhan24.ayantech.ir` و Origin مجاز `web` را نشان می‌دهد. HAR نیز موفقیت `core.svc/v2/DeviceRegister` با چهار فیلد runtime را ثبت کرده است. علت خطای قبلی، host اشتباه `ayanco.com` در تنظیمات MCP بود. مقدار پیش‌فرض در کد و نمونهٔ محیط به `ayantech.ir` اصلاح شده است.
-
-اکنون باید اجرای تازهٔ MCP در حالت live با host اصلاح‌شده آزموده شود. در صورت خطا، status و body پاک‌سازی‌شده ثبت می‌شود.
-
-مقدار پیش‌فرض host اصلاح شده است. مرحلهٔ بعد اجرای تازهٔ MCP در حالت live و تأیید پاسخ `G00000` از مسیر `p24_create_session` است. HAR ثابت می‌کند وب‌سایت همین قرارداد را با موفقیت اجرا کرده، اما جای آزمون تازهٔ برنامه را نمی‌گیرد.
-
-## آماده‌سازی محیط
-
-1. آدرس محیط واقعی موردنظر را در `P24_API_BASE_URL` تعیین کنید.
-2. `P24_MODE=live` و runtime معتبر دستگاه را تنظیم کنید.
-3. migrationها را اجرا و یک نشست تازه بسازید.
-4. اتصال اولیه را با عملیات بدون اثر مالی و حساب آزمایشی بررسی کنید.
-5. برای مسیر پرداخت، callback معتبر و کانال پرداخت مجاز همان محیط را تنظیم کنید.
-
-مقدار `P24_PAYMENT_CALLBACK` صرفاً به upstream فرستاده می‌شود؛ یک URL
-نمونه یا صفحهٔ بازگشت نمی‌تواند موفقیت پرداخت را ثابت کند. مراحل بعد باید
-از اطلاعات معتبر صورتحساب و رسید استخراج شوند.
-
-## ترتیب آزمون‌های واقعی
-
-### ۱. نشست و ورود
-
-- `p24_create_session`: بررسی ایجاد نشست دستگاه یا گزارش دقیق مانع.
-- `p24_import_session`: در صورت استفاده از نشست موجود، آزمون اعتبار با یک عملیات مجاز.
-- `p24_request_otp`: درخواست یک OTP برای شمارهٔ حساب آزمایشی.
-- `p24_verify_otp`: ورود با کد همان درخواست.
-- `p24_login_password`: آزمون مسیر رمز عبور با حساب مربوط، در صورت فعال‌بودن این مسیر.
-- انقضای نشست: بررسی اینکه `G00002` به درخواست ورود مجدد تبدیل شود.
-
-ایجاد شناسهٔ محلی، import یک رشتهٔ token و ورود موفق upstream سه رخداد
-متفاوت‌اند. وضعیت هر کدام باید جدا ثبت شود.
-
-### ۲. استعلام عوارض آزادراهی
-
-ورودی پلاک، قرارداد `FreewayTollBills` و نام خدمت ثبت صورتحساب را بررسی کنید.
-تعرفه و پیش‌نیازها را از پاسخ جاری استخراج کنید؛ ادعای رایگان‌بودن صفحهٔ
-محصول، جای خواندن وضعیت جاری API را نمی‌گیرد. خروجی را با همان حساب در
-محصول اصلی مقایسه کنید.
-
-### ۳. قبض برق
-
-استعلام، مشخصات قبض، فهرست پرداخت، آماده‌سازی پرداخت، وضعیت پس از اقدام
-کاربر و رسید را جدا بررسی کنید. پرداخت موفق بانکی را از تسویهٔ قبض تفکیک
-کنید. نتیجهٔ نمایش‌داده‌شده به کاربر باید با سوابق شرکت قابل تطبیق باشد.
-
-### ۴. استعلام پولی مرسوله
-
-تعرفه، `PurchaseKey` و اعتبار quote را بررسی کنید. پس از خرید معتبر، نتیجه
-استعلام را دریافت کنید. درخواست تکراری با همان کلید باید همان عملیات محلی
-را برگرداند. با قطع ارتباط مصنوعی در محیط تست، مسیر `unknown` و پیگیری را
-آزمایش کنید؛ آن را با برداشت واقعی تکرارشونده آزمایش نکنید.
-
-### ۵. گسترش به سایر خدمات
-
-برای هر خدمت، مسیر کشف عملیات → قرارداد ورودی → پیش‌نیاز → هزینه → اجرا →
-پیگیری → نتیجه/رسید را کامل کنید. عملیات عمومی حساب یا پرداخت را صرفاً به
-دلیل موجودبودن در رجیستری، به همهٔ خدمات تعمیم ندهید.
-
-## شواهد لازم برای تغییر وضعیت پوشش
-
-برای هر فرایند، این اطلاعات را در گزارش آزمون ثبت کنید:
-
-| فیلد | توضیح |
-|---|---|
-| خدمت و `action_id` | تطبیق محصول با قرارداد اجرایی |
-| محیط و نسخه | sandbox یا محیط واقعی و نسخهٔ قرارداد |
-| نام فیلدهای ورودی | همراه دادهٔ نمونهٔ پاک‌سازی‌شده |
-| پیش‌نیازها | ورود، اطلاعات مالک، خرید یا تأیید لازم |
-| وضعیت و کد upstream | انتظار و مشاهدهٔ واقعی |
-| شناسهٔ عملیات و مرجع upstream | برای تطبیق با سوابق شرکت |
-| مبلغ و واحد پول | مقدار اعلام‌شده، کسرشده و نتیجهٔ نهایی |
-| تکرار و timeout | رفتار مشاهده‌شده بدون اجرای دوبارهٔ ناخواسته |
-| نتیجه و رسید | تطبیق با محصول اصلی |
-
-OTP، رمز، token، اطلاعات کارت و پاسخ کامل دارای دادهٔ شخصی را در گزارش
-مخزن قرار ندهید. گزارش باید برای تکرار و تشخیص نتیجه کافی باشد، بدون تبدیل
-شدن به نسخه‌ای از داده‌های واقعی حساب.
-
-## معیار تحویل یک خدمت live
-
-یک خدمت زمانی آزموده‌شده محسوب می‌شود که ورودی معتبر، پیش‌نیازها، اثر مالی،
-نتیجهٔ نهایی، رفتار تکرار و مسیر خطای آن با حساب مربوط بررسی شده باشد.
-`source_verified`، موفقیت HTTP و وجود یک ابزار MCP هر کدام فقط بخشی از این
-شواهد هستند.
-
-خروجی `p24_capabilities` و اسناد پوشش باید همان وضعیت واقعی را بیان کنند.
-تا پیش از این آزمون‌ها، عبارت مناسب «زیرساخت اجرا و قرارداد مشاهده‌شده آماده
-است» خواهد بود.
+This review did not complete a fresh live login, paid inquiry, bank payment or
+provider webhook transaction. Local fresh bootstrap failed with UPSTREAM_CONNECTION.
+No additional uploaded source is required to run the local/demo tests.

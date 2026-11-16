@@ -89,7 +89,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 P24_MODE = os.getenv("P24_MODE", "demo").lower()
 if P24_MODE not in {"demo", "live"}:
     raise ValueError("P24_MODE must be demo or live")
-P24_API_BASE_URL = os.getenv("P24_API_BASE_URL", "https://core.pishkhan24.ayantech.ir/webservices").rstrip("/")
+P24_API_BASE_URL = os.getenv(
+    "P24_API_BASE_URL", "https://core.pishkhan24.ayantech.ir/webservices"
+).rstrip("/")
 P24_API_TIMEOUT = float(os.getenv("P24_API_TIMEOUT", "30"))
 P24_APPLICATION = os.getenv("P24_APPLICATION", "pishkhan24")
 P24_ORIGIN = os.getenv("P24_ORIGIN", "web")

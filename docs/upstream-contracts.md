@@ -1,6 +1,6 @@
 # قراردادهای مشاهده‌شدهٔ پیشخوان۲۴
 
-Reviewed: **2026-11-16**. The registry in `apps/providers/data/pishkhan_actions.json`
+Reviewed: **2026-11-16**. See [company source and HAR review](source-and-har-review.md) for source-backed bootstrap, login, electricity and taxi contracts. The registry in `apps/providers/data/pishkhan_actions.json`
 contains **153 distinct endpoint actions** found in public frontend JavaScript.
 These are source-observed contracts, not an internal OpenAPI specification and
 not a claim that 153 authenticated journeys have passed live tests.

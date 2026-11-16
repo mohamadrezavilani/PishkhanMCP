@@ -277,3 +277,4 @@ uv pip compile pyproject.toml --extra dev --extra postgres -o requirements.lock
 - [فهرست خدمات و وضعیت پوشش](docs/service-coverage.md)
 - [اتصال کلاینت‌های MCP](docs/mcp-clients.md)
 - [اعتبارسنجی اتصال واقعی](docs/live-validation.md)
+- [بررسی سورس شرکت و HAR](docs/source-and-har-review.md)

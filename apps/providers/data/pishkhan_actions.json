@@ -6665,6 +6665,136 @@
       ],
       "response_notes": "Envelope: Status.Code/Type/Description and Parameters. G00000 success; G00002 session expired. Authenticated behavior has not been tested.",
       "status": "source_verified"
+    },
+    {
+      "id": "services_municipality_taxi_fares_barcode_info_v1",
+      "group": "services",
+      "path": "v1/MunicipalityTaxiFaresBillsBarcodeInfo",
+      "title_fa": "اطلاعات بارکد کرایه تاکسی",
+      "description": "دریافت مشخصات خودرو و کرایه‌های پیشنهادی بر اساس بارکد قبض تاکسی شهرداری.",
+      "service_ids": [
+        "taxipay"
+      ],
+      "frontend_service_names": [
+        "v1_InquiryMunicipalityTaxiFaresBills"
+      ],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "read",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "Barcode": {
+            "type": "string",
+            "pattern": "^10[0-9]{8}$"
+          }
+        },
+        "required": [
+          "Barcode"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "source": "core-main/Core/Intermediate/Modules/Services/Vehicle/Commands/MunicipalityTolls/MunicipalityTaxiFaresBillsBarcodeInfoCommand.cs",
+        "reviewed_at": "2026-11-16",
+        "kind": "company_source",
+        "sha256": "64d3737d17def4806546d46b9cb2add66e8c3832ea6fb1c20b4ce02d50023f06"
+      },
+      "parameter_evidence": [
+        {
+          "source": "MunicipalityTaxiFaresBillsBarcodeInfoModel.cs",
+          "fields": [
+            "Barcode"
+          ],
+          "kind": "request_model"
+        },
+        {
+          "source": "MunicipalityTaxiFaresBillsBarcodeInfoHandler.cs",
+          "fields": [
+            "FullName",
+            "NationalCode",
+            "VehiclePlateNumber",
+            "Source",
+            "Destination",
+            "Fares.SuggestedAmounts"
+          ],
+          "kind": "response_mapping"
+        }
+      ],
+      "response_notes": "Barcode must be 10 digits and begin with 10. Response includes owner, vehicle, route and suggested fare data. Not present in supplied HAR.",
+      "status": "source_verified",
+      "workflow_mapping": "source_verified_endpoint"
+    },
+    {
+      "id": "services_municipality_taxi_fares_bills_v1",
+      "group": "services",
+      "path": "v1/MunicipalityTaxiFaresBills",
+      "title_fa": "ثبت پرداخت کرایه تاکسی",
+      "description": "ثبت پرداخت کرایه تاکسی بر اساس بارکد، مبلغ انتخابی و PurchaseKey صورتحساب.",
+      "service_ids": [
+        "taxipay"
+      ],
+      "frontend_service_names": [
+        "v1_InquiryMunicipalityTaxiFaresBills"
+      ],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "write",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "Barcode": {
+            "type": "string",
+            "pattern": "^10[0-9]{8}$"
+          },
+          "Amount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000
+          },
+          "PurchaseKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "Barcode",
+          "Amount",
+          "PurchaseKey"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "source": "core-main/Core/Intermediate/Modules/Services/Vehicle/Commands/MunicipalityTolls/MunicipalityTaxiFaresBillsCommand.cs",
+        "reviewed_at": "2026-11-16",
+        "kind": "company_source",
+        "sha256": "9fa4ec4d3161435edcdf83e0446dc8901791e9ef55fff8aa3511d93bf9e9c68e"
+      },
+      "parameter_evidence": [
+        {
+          "source": "MunicipalityTaxiFaresBillsModel.cs",
+          "fields": [
+            "Barcode",
+            "Amount",
+            "PurchaseKey"
+          ],
+          "kind": "request_model"
+        },
+        {
+          "source": "MunicipalityTaxiFaresBillsCommand.cs",
+          "fields": [
+            "Barcode",
+            "Amount",
+            "PurchaseKey"
+          ],
+          "kind": "validation_and_query_mapping"
+        }
+      ],
+      "response_notes": "Barcode must be 10 digits and begin with 10; Amount must be > 0 and <= 1,000,000. Invoice validation is required. Not present in supplied HAR.",
+      "status": "source_verified",
+      "workflow_mapping": "source_verified_endpoint"
     }
   ],
   "currency_evidence": {

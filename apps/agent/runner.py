@@ -231,8 +231,14 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
 
     usage = _reserve_daily_message()
     if usage and usage.get("error") == "daily_limit":
-        return _error("agent_daily_limit", "سقف روزانهٔ پیام‌های ایجنت تمام شده است؛ فردا دوباره تلاش کنید.",
-                      limit=usage["limit"], used=usage["used"], remaining=0, resets_on=usage["resets_on"])
+        return _error(
+            "agent_daily_limit",
+            "سقف روزانهٔ پیام‌های ایجنت تمام شده است؛ فردا دوباره تلاش کنید.",
+            limit=usage["limit"],
+            used=usage["used"],
+            remaining=0,
+            resets_on=usage["resets_on"],
+        )
     if usage and usage.get("error"):
         return _error("agent_budget_configuration", "تنظیم سقف مصرف روزانه معتبر نیست.")
 

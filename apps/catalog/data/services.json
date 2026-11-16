@@ -1,0 +1,3116 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-11-16",
+  "scope": "56 public service menu entries; not 56 verified APIs or implemented live workflows.",
+  "categories": [
+    {
+      "id": "social_insurance",
+      "name_fa": "اجتماعی و بیمه",
+      "count": 18
+    },
+    {
+      "id": "bills",
+      "name_fa": "قبض",
+      "count": 10
+    },
+    {
+      "id": "vehicles",
+      "name_fa": "خودرو و موتور",
+      "count": 15
+    },
+    {
+      "id": "mobile",
+      "name_fa": "شارژ و بسته",
+      "count": 3
+    },
+    {
+      "id": "banking",
+      "name_fa": "بانکی و ارزی",
+      "count": 4
+    },
+    {
+      "id": "postal",
+      "name_fa": "پستی",
+      "count": 4
+    },
+    {
+      "id": "judicial",
+      "name_fa": "قوه قضائیه",
+      "count": 2
+    }
+  ],
+  "services": [
+    {
+      "id": "tamin",
+      "name_fa": "سوابق بیمه",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/tamin/",
+      "description": "استعلام سوابق بیمه تأمین اجتماعی با احراز هویت فرد بیمه‌شده.",
+      "keywords": [
+        "tamin",
+        "سوابق بیمه"
+      ],
+      "capability_kind": "paid_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شماره موبایل به نام شخص و ثبت‌شده در my.gov.ir",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "electronicprescribe",
+      "name_fa": "نسخه تامین اجتماعی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/electronicprescribe/",
+      "description": "مشاهده اطلاعات نسخه‌های الکترونیکی تأمین اجتماعی برای سال انتخاب‌شده.",
+      "keywords": [
+        "electronicprescribe",
+        "نسخه تامین اجتماعی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "year": {
+            "type": "string",
+            "title": "سال",
+            "description": "سال مورد درخواست؛ نوع تقویم باید در قرارداد تأمین‌کننده مشخص شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شماره موبایل و سال",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "saham",
+      "name_fa": "ارزش سهام عدالت",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/saham/",
+      "description": "استعلام ارزش سهام عدالت با اطلاعات هویتی و مرحله تأیید مربوط.",
+      "keywords": [
+        "saham",
+        "ارزش سهام عدالت"
+      ],
+      "capability_kind": "paid_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی؛ OTP در راهنما ذکر شده",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "این مدخل استعلام ارزش را پوشش می‌دهد؛ معامله سهام در آن تأیید نشده است."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "yaraneh",
+      "name_fa": "یارانه",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/yaraneh/",
+      "description": "استعلام وضعیت یارانه خانوار از مسیر احراز هویت سرپرست خانوار.",
+      "keywords": [
+        "yaraneh",
+        "یارانه"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شماره موبایل سرپرست خانوار ثبت‌شده در gov.ir",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "subsidy",
+      "name_fa": "دهک معیشتی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/subsidy/",
+      "description": "استعلام دهک معیشتی خانوار؛ پیش‌نیازهای فرم و متن عمومی یکسان نیستند.",
+      "keywords": [
+        "subsidy",
+        "دهک معیشتی"
+      ],
+      "capability_kind": "paid_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "فرم: موبایل و کد ملی سرپرست؛ متن: فقط موبایل + کد تایید؛ تعارض نیازمند قرارداد API",
+      "requirements_status": "ambiguous",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "صفحه عمومی درباره لزوم کد ملی در فرم و متن یکسان نیست؛ قرارداد واقعی باید تعیین‌کننده باشد."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "electronic-subsidy",
+      "name_fa": "کالابرگ الکترونیکی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/electronic-subsidy/",
+      "description": "استعلام کالابرگ الکترونیکی و مسیر دریافت رمز خرید معرفی‌شده در محصول.",
+      "keywords": [
+        "electronic subsidy",
+        "کالابرگ الکترونیکی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "inquiry",
+              "purchase_code"
+            ],
+            "description": "مسیر انتخاب‌شده در خدمت؛ قابلیت اجرای هر مسیر باید از آداپتور بررسی شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی و موبایل سرپرست + OTP؛ دو زیرخدمت استعلام و رمز خرید",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [
+        {
+          "id": "inquiry",
+          "name_fa": "استعلام کالابرگ",
+          "cost_mode": "unknown"
+        },
+        {
+          "id": "purchase_code",
+          "name_fa": "دریافت رمز خرید",
+          "cost_mode": "unknown",
+          "requirements": "مرحله تأیید و قرارداد جداگانه لازم است."
+        }
+      ],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "insurancepolicy",
+      "name_fa": "بیمه‌نامه",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/insurancepolicy/",
+      "description": "استعلام اطلاعات بیمه‌نامه؛ جزئیات ورودی و خروجی نیازمند قرارداد سرویس است.",
+      "keywords": [
+        "insurancepolicy",
+        "بیمه‌نامه"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "fishmostamari",
+      "name_fa": "فیش تامین اجتماعی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/fishmostamari/",
+      "description": "دریافت اطلاعات فیش مستمری تأمین اجتماعی از مسیر احراز هویت شخص.",
+      "keywords": [
+        "fishmostamari",
+        "فیش تامین اجتماعی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "موبایل به نام شخص ثبت‌شده در my.gov.ir",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "fishekeshvari",
+      "name_fa": "فیش بازنشستگان کشوری",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/fishekeshvari/",
+      "description": "استعلام فیش بازنشستگان کشوری برای ماه و سال انتخاب‌شده.",
+      "keywords": [
+        "fishekeshvari",
+        "فیش بازنشستگان کشوری"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "account_number": {
+            "type": "string",
+            "title": "شماره حساب",
+            "description": "شماره حساب به صورت رشته؛ صفر ابتدایی حفظ می‌شود."
+          },
+          "ledger_number": {
+            "type": "string",
+            "title": "شماره دفتر کل",
+            "description": "شناسه دفتر کل مستمری‌بگیر به صورت رشته."
+          },
+          "month": {
+            "type": "string",
+            "title": "ماه",
+            "description": "ماه مورد درخواست؛ با تقویم قرارداد تأمین‌کننده."
+          },
+          "year": {
+            "type": "string",
+            "title": "سال",
+            "description": "سال مورد درخواست؛ نوع تقویم باید در قرارداد تأمین‌کننده مشخص شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی، شماره حساب، شماره دفتر کل، ماه و سال",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "hokmmostamari",
+      "name_fa": "حکم تامین اجتماعی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/hokmmostamari/",
+      "description": "استعلام حکم مستمری تأمین اجتماعی برای سال انتخاب‌شده.",
+      "keywords": [
+        "hokmmostamari",
+        "حکم تامین اجتماعی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "year": {
+            "type": "string",
+            "title": "سال",
+            "description": "سال مورد درخواست؛ نوع تقویم باید در قرارداد تأمین‌کننده مشخص شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شماره موبایل و سال",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "hokmbazneshasteghi",
+      "name_fa": "حکم بازنشستگان کشوری",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/hokmbazneshasteghi/",
+      "description": "استعلام حکم بازنشستگان کشوری با اطلاعات شناسایی مستمری‌بگیر.",
+      "keywords": [
+        "hokmbazneshasteghi",
+        "حکم بازنشستگان کشوری"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "account_number": {
+            "type": "string",
+            "title": "شماره حساب",
+            "description": "شماره حساب به صورت رشته؛ صفر ابتدایی حفظ می‌شود."
+          },
+          "ledger_number": {
+            "type": "string",
+            "title": "شماره دفتر کل",
+            "description": "شناسه دفتر کل مستمری‌بگیر به صورت رشته."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی، شماره حساب، شماره دفتر کل",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "insurancecard",
+      "name_fa": "اعتبار دفترچه بیمه",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/insurancecard/",
+      "description": "استعلام اعتبار دفترچه بیمه؛ قرارداد ورودی هنوز تأیید نشده است.",
+      "keywords": [
+        "insurancecard",
+        "اعتبار دفترچه بیمه"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "rentalcontractinquiry",
+      "name_fa": "اجاره نامه ملک",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/rentalcontractinquiry/",
+      "description": "استعلام اطلاعات اجاره‌نامه ملک؛ این مدخل به معنی ایجاد قرارداد نیست.",
+      "keywords": [
+        "rentalcontractinquiry",
+        "اجاره نامه ملک"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "national-id-card",
+      "name_fa": "پیگیری کارت ملی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/national-id-card/",
+      "description": "پیگیری وضعیت کارت ملی؛ این مدخل به معنی ثبت درخواست صدور کارت نیست.",
+      "keywords": [
+        "national id card",
+        "پیگیری کارت ملی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "my-simcart",
+      "name_fa": "سیم‌کارت‌های به‌نام",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/my-simcart/",
+      "description": "استعلام سیم‌کارت‌های ثبت‌شده به نام شخص.",
+      "keywords": [
+        "my simcart",
+        "سیم‌کارت‌های به‌نام"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "study-exemption",
+      "name_fa": "معافیت تحصیلی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/study-exemption/",
+      "description": "استعلام وضعیت معافیت تحصیلی.",
+      "keywords": [
+        "study exemption",
+        "معافیت تحصیلی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "exitban",
+      "name_fa": "استعلام ممنوع الخروجی",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/exitban/",
+      "description": "استعلام ممنوع‌الخروجی؛ صفحه عمومی تحویل نتیجه از طریق پیامک را شرح می‌دهد.",
+      "keywords": [
+        "exitban",
+        "استعلام ممنوع الخروجی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "birth_date": {
+            "type": "string",
+            "title": "تاریخ تولد",
+            "description": "تاریخ تولد همراه با قالب و تقویم تأییدشده توسط تأمین‌کننده."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی، موبایل، تاریخ تولد؛ نتیجه از طریق پیامک طبق صفحه",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "exit-consent",
+      "name_fa": "رضایت خروج از کشور",
+      "category": "social_insurance",
+      "category_fa": "اجتماعی و بیمه",
+      "source_url": "https://pishkhan24.com/exit-consent/",
+      "description": "استعلام رضایت موجود برای خروج از کشور؛ اعطای رضایت جدید در این خدمت تأیید نشده است.",
+      "keywords": [
+        "exit consent",
+        "رضایت خروج از کشور"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "birth_date": {
+            "type": "string",
+            "title": "تاریخ تولد",
+            "description": "تاریخ تولد همراه با قالب و تقویم تأییدشده توسط تأمین‌کننده."
+          },
+          "guardian_national_id": {
+            "type": "string",
+            "title": "کد ملی همسر یا ولی",
+            "description": "شناسه فرد مرتبط در استعلام رضایت موجود."
+          },
+          "guardian_mobile": {
+            "type": "string",
+            "title": "موبایل همسر یا ولی",
+            "description": "شماره موبایل فرد مرتبط در استعلام رضایت موجود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی، موبایل، تولد متقاضی؛ کد ملی و موبایل همسر/ولی؛ فقط استعلام رضایت موجود",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "استعلام رضایت موجود؛ ابزار اعطای رضایت جدید نیست."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "electricity",
+      "name_fa": "قبض برق",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/electricity/",
+      "description": "استعلام قبض برق، جزئیات و مسیر پرداخت و دریافت رسید.",
+      "keywords": [
+        "electricity",
+        "قبض برق"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "bill_id": {
+            "type": "string",
+            "title": "شناسه قبض",
+            "description": "شناسه قبض به صورت رشته؛ صفر ابتدایی حفظ می‌شود."
+          }
+        },
+        "required": [
+          "bill_id"
+        ],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شناسه قبض؛ یا شناسه قبض و پرداخت در خدمت قبض کاغذی",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "water",
+      "name_fa": "قبض آب",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/water/",
+      "description": "استعلام و پرداخت قبض آب؛ جزئیات ورودی نیازمند قرارداد سرویس است.",
+      "keywords": [
+        "water",
+        "قبض آب"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "gas",
+      "name_fa": "قبض گاز",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/gas/",
+      "description": "استعلام و پرداخت قبض گاز؛ جزئیات ورودی نیازمند قرارداد سرویس است.",
+      "keywords": [
+        "gas",
+        "قبض گاز"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "phone",
+      "name_fa": "قبض تلفن ثابت",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/phone/",
+      "description": "استعلام و پرداخت قبض تلفن ثابت.",
+      "keywords": [
+        "phone",
+        "قبض تلفن ثابت"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "mci",
+      "name_fa": "قبض همراه اول",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/mci/",
+      "description": "استعلام و پرداخت قبض همراه اول.",
+      "keywords": [
+        "mci",
+        "قبض همراه اول"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "irancell",
+      "name_fa": "قبض ایرانسل",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/irancell/",
+      "description": "استعلام و پرداخت قبض ایرانسل.",
+      "keywords": [
+        "irancell",
+        "قبض ایرانسل"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "rightel",
+      "name_fa": "قبض رایتل",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/rightel/",
+      "description": "استعلام و پرداخت قبض رایتل.",
+      "keywords": [
+        "rightel",
+        "قبض رایتل"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "avarezmelk",
+      "name_fa": "عوارض ملک",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/avarezmelk/",
+      "description": "استعلام و پرداخت عوارض ملک.",
+      "keywords": [
+        "avarezmelk",
+        "عوارض ملک"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "paperbill",
+      "name_fa": "قبض کاغذی",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/paperbill/",
+      "description": "آماده‌سازی پرداخت قبض با شناسه قبض و شناسه پرداخت.",
+      "keywords": [
+        "paperbill",
+        "قبض کاغذی"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "bill_id": {
+            "type": "string",
+            "title": "شناسه قبض",
+            "description": "شناسه قبض به صورت رشته؛ صفر ابتدایی حفظ می‌شود."
+          },
+          "payment_id": {
+            "type": "string",
+            "title": "شناسه پرداخت",
+            "description": "شناسه پرداخت قبض به صورت رشته."
+          }
+        },
+        "required": [
+          "bill_id",
+          "payment_id"
+        ],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شناسه قبض و شناسه پرداخت",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "taxipay",
+      "name_fa": "کرایه تاکسی",
+      "category": "bills",
+      "category_fa": "قبض",
+      "source_url": "https://pishkhan24.com/taxipay/",
+      "description": "پرداخت کرایه تاکسی با کد یا بارکد؛ صفحه عمومی به اپلیکیشن هدایت می‌کند.",
+      "keywords": [
+        "taxipay",
+        "کرایه تاکسی"
+      ],
+      "capability_kind": "app_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "taxi_code": {
+            "type": "string",
+            "title": "کد تاکسی",
+            "description": "کد متنی یا مقدار خوانده‌شده از بارکد تاکسی."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "تایپ یا اسکن بارکد؛ صفحه عمومی به نصب اپلیکیشن هدایت می‌کند",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [
+        "صفحه عمومی به نصب اپلیکیشن هدایت می‌کند؛ جریان پرداخت وب تأیید نشده است."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "khalafi",
+      "name_fa": "خلافی خودرو",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/khalafi/",
+      "description": "استعلام خلافی خودرو، جزئیات تخلفات و مسیر پرداخت؛ تصاویر ممکن است تعرفه جدا داشته باشند.",
+      "keywords": [
+        "khalafi",
+        "خلافی خودرو"
+      ],
+      "capability_kind": "paid_inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "title": "پلاک",
+            "description": "نمایش متنی پلاک؛ تبدیل به قالب اختصاصی تأمین‌کننده در آداپتور انجام می‌شود."
+          },
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "details",
+              "images",
+              "payment"
+            ],
+            "description": "مسیر انتخاب‌شده در خدمت؛ قابلیت اجرای هر مسیر باید از آداپتور بررسی شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "پلاک؛ برای جزئیات کد ملی و موبایل مالک؛ تصاویر ممکن است هزینه جدا داشته باشند",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [
+        {
+          "id": "summary",
+          "name_fa": "استعلام تجمیعی",
+          "cost_mode": "paid",
+          "required_fields": [
+            "plate"
+          ]
+        },
+        {
+          "id": "details",
+          "name_fa": "استعلام جزئیات",
+          "cost_mode": "paid",
+          "required_fields": [
+            "plate",
+            "national_id",
+            "mobile"
+          ]
+        },
+        {
+          "id": "images",
+          "name_fa": "تصاویر تخلف",
+          "cost_mode": "unknown",
+          "requirements": "تعرفه و امکان دریافت تصویر باید از پاسخ سرویس تعیین شود."
+        },
+        {
+          "id": "payment",
+          "name_fa": "پرداخت خلافی",
+          "cost_mode": "paid",
+          "requirements": "اطلاعات بدهی از نتیجه معتبر استعلام انتخاب شود."
+        }
+      ],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "khalafimotor",
+      "name_fa": "خلافی موتورسیکلت",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/khalafimotor/",
+      "description": "استعلام خلافی موتورسیکلت و مسیر پرداخت.",
+      "keywords": [
+        "khalafimotor",
+        "خلافی موتورسیکلت"
+      ],
+      "capability_kind": "paid_inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "freeway",
+      "name_fa": "عوارض آزادراهی",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/freeway/",
+      "description": "استعلام تجمیعی عوارض آزادراهی با پلاک؛ صفحه عمومی استعلام بدون جزئیات را رایگان معرفی می‌کند.",
+      "keywords": [
+        "freeway",
+        "عوارض آزادراهی"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "title": "پلاک",
+            "description": "نمایش متنی پلاک؛ تبدیل به قالب اختصاصی تأمین‌کننده در آداپتور انجام می‌شود."
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "details",
+              "payment"
+            ],
+            "description": "مسیر انتخاب‌شده در خدمت؛ قابلیت اجرای هر مسیر باید از آداپتور بررسی شود.",
+            "default": "summary"
+          }
+        },
+        "required": [
+          "plate"
+        ],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "پلاک: استعلام بدون جزئیات رایگان؛ جزئیات نیازمند اطلاعات مالک",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "free",
+      "cost_scope": "summary_inquiry_only",
+      "requires_account": false,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [
+        {
+          "id": "summary",
+          "name_fa": "استعلام تجمیعی",
+          "cost_mode": "free",
+          "required_fields": [
+            "plate"
+          ]
+        },
+        {
+          "id": "details",
+          "name_fa": "استعلام جزئیات",
+          "cost_mode": "unknown",
+          "requirements": "اطلاعات مالک لازم است؛ قرارداد دقیق تأیید نشده."
+        },
+        {
+          "id": "payment",
+          "name_fa": "پرداخت عوارض",
+          "cost_mode": "paid",
+          "requirements": "بدهی و روش پرداخت از قرارداد واقعی استخراج شود."
+        }
+      ],
+      "limitations": [
+        "رایگان‌بودن صرفاً برای استعلام تجمیعی است؛ جزئیات و پرداخت را شامل نمی‌شود."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "avarezkhodro",
+      "name_fa": "عوارض سالیانه خودرو",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/avarezkhodro/",
+      "description": "استعلام و پرداخت عوارض سالیانه خودرو.",
+      "keywords": [
+        "avarezkhodro",
+        "عوارض سالیانه خودرو"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "shahrdarikhodro",
+      "name_fa": "جریمه طرح ترافیک",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/shahrdarikhodro/",
+      "description": "استعلام و پرداخت جریمه طرح ترافیک.",
+      "keywords": [
+        "shahrdarikhodro",
+        "جریمه طرح ترافیک"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "nomremanfi",
+      "name_fa": "نمره منفی گواهینامه",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/nomremanfi/",
+      "description": "استعلام نمره منفی گواهینامه رانندگی.",
+      "keywords": [
+        "nomremanfi",
+        "نمره منفی گواهینامه"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "platenumber",
+      "name_fa": "پلاک‌های فعال",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/platenumber/",
+      "description": "استعلام پلاک‌های فعال ثبت‌شده به نام شخص.",
+      "keywords": [
+        "platenumber",
+        "پلاک‌های فعال"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "bimesales",
+      "name_fa": "بیمه شخص ثالث",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/bimesales/",
+      "description": "استعلام بیمه شخص ثالث به صورت تجمیعی یا با جزئیات.",
+      "keywords": [
+        "bimesales",
+        "بیمه شخص ثالث"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "title": "پلاک",
+            "description": "نمایش متنی پلاک؛ تبدیل به قالب اختصاصی تأمین‌کننده در آداپتور انجام می‌شود."
+          },
+          "insurance_code": {
+            "type": "string",
+            "title": "کد یکتای بیمه",
+            "description": "کد یکتای بیمه‌نامه برای مسیر دارای جزئیات."
+          },
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "details"
+            ],
+            "description": "مسیر انتخاب‌شده در خدمت؛ قابلیت اجرای هر مسیر باید از آداپتور بررسی شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "جزئیات با کد یکتا+کد ملی؛ بدون جزئیات با پلاک فقط برای خودرو",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [
+        {
+          "id": "summary",
+          "name_fa": "استعلام بدون جزئیات",
+          "cost_mode": "unknown",
+          "required_fields": [
+            "plate"
+          ],
+          "limitations": [
+            "طبق صفحه عمومی این مسیر برای خودرو است."
+          ]
+        },
+        {
+          "id": "details",
+          "name_fa": "استعلام جزئیات",
+          "cost_mode": "unknown",
+          "required_fields": [
+            "insurance_code",
+            "national_id"
+          ]
+        }
+      ],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "cartax",
+      "name_fa": "مالیات انتقال خودرو",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/cartax/",
+      "description": "استعلام و پرداخت مالیات نقل‌وانتقال خودرو.",
+      "keywords": [
+        "cartax",
+        "مالیات انتقال خودرو"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "title": "پلاک",
+            "description": "نمایش متنی پلاک؛ تبدیل به قالب اختصاصی تأمین‌کننده در آداپتور انجام می‌شود."
+          },
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "birth_date": {
+            "type": "string",
+            "title": "تاریخ تولد",
+            "description": "تاریخ تولد همراه با قالب و تقویم تأییدشده توسط تأمین‌کننده."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "پلاک و کد ملی مالک؛ فیلد تاریخ تولد در صفحه نیز وجود دارد",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "motortransfertax",
+      "name_fa": "مالیات انتقال موتور",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/motortransfertax/",
+      "description": "استعلام و پرداخت مالیات نقل‌وانتقال موتورسیکلت.",
+      "keywords": [
+        "motortransfertax",
+        "مالیات انتقال موتور"
+      ],
+      "capability_kind": "inquiry_and_payment",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "prepare_payment",
+        "payment_status",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "technicalexaminationcertificate",
+      "name_fa": "معاینه فنی",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/technicalexaminationcertificate/",
+      "description": "استعلام وضعیت معاینه فنی؛ صدور گواهی در این مدخل تأیید نشده است.",
+      "keywords": [
+        "technicalexaminationcertificate",
+        "معاینه فنی"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "cardocuments",
+      "name_fa": "کارت و سند خودرو",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/cardocuments/",
+      "description": "پیگیری کارت و سند خودرو.",
+      "keywords": [
+        "cardocuments",
+        "کارت و سند خودرو"
+      ],
+      "capability_kind": "paid_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "drivinglicence",
+      "name_fa": "گواهینامه رانندگی",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/drivinglicence/",
+      "description": "پیگیری وضعیت گواهینامه رانندگی.",
+      "keywords": [
+        "drivinglicence",
+        "گواهینامه رانندگی"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "carauthenticity",
+      "name_fa": "سوابق خودرو",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/carauthenticity/",
+      "description": "استعلام سوابق خودرو.",
+      "keywords": [
+        "carauthenticity",
+        "سوابق خودرو"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "car-plate-history",
+      "name_fa": "تاریخچه پلاک",
+      "category": "vehicles",
+      "category_fa": "خودرو و موتور",
+      "source_url": "https://pishkhan24.com/car-plate-history/",
+      "description": "استعلام تاریخچه پلاک با اطلاعات مالک و مرحله تأیید معرفی‌شده در راهنما.",
+      "keywords": [
+        "car plate history",
+        "تاریخچه پلاک"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "plate": {
+            "type": "string",
+            "title": "پلاک",
+            "description": "نمایش متنی پلاک؛ تبدیل به قالب اختصاصی تأمین‌کننده در آداپتور انجام می‌شود."
+          },
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "پلاک، کد ملی و موبایل مالک؛ OTP در راهنمای رسمی",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "topup",
+      "name_fa": "شارژ سیم کارت",
+      "category": "mobile",
+      "category_fa": "شارژ و بسته",
+      "source_url": "https://pishkhan24.com/topup/",
+      "description": "انتخاب و خرید شارژ سیم‌کارت با تشخیص یا تصحیح اپراتور.",
+      "keywords": [
+        "topup",
+        "شارژ سیم کارت"
+      ],
+      "capability_kind": "purchase",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "operator": {
+            "type": "string",
+            "title": "اپراتور",
+            "description": "اپراتور فعلی سیم‌کارت؛ با توجه به ترابرد صرفاً از پیش‌شماره استنباط نشود."
+          },
+          "product_id": {
+            "type": "string",
+            "title": "شناسه محصول",
+            "description": "شناسه محصول از پاسخ فهرست محصولات تأمین‌کننده؛ مقدار دلخواه ساخته نشود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "موبایل، اپراتور با امکان تصحیح ترابرد، انتخاب محصول",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "list_products",
+        "purchase",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [
+        "ترابردپذیری اجازه تعیین قطعی اپراتور صرفاً از پیش‌شماره را نمی‌دهد."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "internetpackage",
+      "name_fa": "بسته اینترنت همراه",
+      "category": "mobile",
+      "category_fa": "شارژ و بسته",
+      "source_url": "https://pishkhan24.com/internetpackage/",
+      "description": "انتخاب و خرید بسته اینترنت همراه بر اساس اپراتور و نوع سیم‌کارت.",
+      "keywords": [
+        "internetpackage",
+        "بسته اینترنت همراه"
+      ],
+      "capability_kind": "purchase",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "operator": {
+            "type": "string",
+            "title": "اپراتور",
+            "description": "اپراتور فعلی سیم‌کارت؛ با توجه به ترابرد صرفاً از پیش‌شماره استنباط نشود."
+          },
+          "sim_type": {
+            "type": "string",
+            "title": "نوع سیم‌کارت",
+            "description": "اعتباری یا دائمی طبق گزینه‌های تأمین‌کننده."
+          },
+          "product_id": {
+            "type": "string",
+            "title": "شناسه محصول",
+            "description": "شناسه محصول از پاسخ فهرست محصولات تأمین‌کننده؛ مقدار دلخواه ساخته نشود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "موبایل، اپراتور با امکان تصحیح ترابرد، دائمی/اعتباری، بسته",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "list_products",
+        "purchase",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [
+        "اپراتور و نوع سیم‌کارت بر فهرست محصولات اثر می‌گذارند."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "roaming",
+      "name_fa": "بسته‌های رومینگ",
+      "category": "mobile",
+      "category_fa": "شارژ و بسته",
+      "source_url": "https://pishkhan24.com/roaming/",
+      "description": "انتخاب و خرید بسته رومینگ؛ قرارداد محصولات نیازمند تأیید است.",
+      "keywords": [
+        "roaming",
+        "بسته‌های رومینگ"
+      ],
+      "capability_kind": "purchase",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status",
+        "list_products",
+        "purchase",
+        "receipt"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "sheba",
+      "name_fa": "دریافت شماره شبا",
+      "category": "banking",
+      "category_fa": "بانکی و ارزی",
+      "source_url": "https://pishkhan24.com/sheba/",
+      "description": "تبدیل یا استعلام شماره کارت، حساب یا شبا؛ عملیات انتقال وجه در این مدخل تعریف نشده است.",
+      "keywords": [
+        "sheba",
+        "دریافت شماره شبا"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "bank_identifier": {
+            "type": "string",
+            "title": "شناسه بانکی",
+            "description": "شماره کارت، شماره حساب یا شبا متناسب با نوع تبدیل."
+          },
+          "identifier_type": {
+            "type": "string",
+            "title": "نوع شناسه بانکی",
+            "description": "نوع ورودی کارت، حساب یا شبا؛ قرارداد عملیات باید تأیید شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شماره کارت/حساب/شبا، نوع حساب؛ تبدیل/استعلام",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "این مدخل تبدیل یا استعلام شناسه است؛ انتقال وجه نیست."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "sayad",
+      "name_fa": "چک صیادی",
+      "category": "banking",
+      "category_fa": "بانکی و ارزی",
+      "source_url": "https://pishkhan24.com/sayad/",
+      "description": "استعلام وضعیت چک صیادی با شناسه صیاد.",
+      "keywords": [
+        "sayad",
+        "چک صیادی"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "sayad_id": {
+            "type": "string",
+            "title": "شناسه صیاد",
+            "description": "شناسه چک صیادی به صورت رشته."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شناسه صیاد؛ صفحه می‌گوید احراز هویت لازم نیست",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": false,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "crypto",
+      "name_fa": "ارز دیجیتال",
+      "category": "banking",
+      "category_fa": "بانکی و ارزی",
+      "source_url": "https://pishkhan24.com/crypto/",
+      "description": "مشاهده قیمت ارزهای دیجیتال؛ این خدمت قابلیت خریدوفروش ندارد.",
+      "keywords": [
+        "crypto",
+        "ارز دیجیتال"
+      ],
+      "capability_kind": "market_data",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "فقط قیمت؛ خریدوفروش فراهم نیست",
+      "requirements_status": "no_public_identity_inputs_observed",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": false,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "execute"
+      ],
+      "variants": [],
+      "limitations": [
+        "فقط نمایش قیمت؛ خریدوفروش ارز دیجیتال در محصول معرفی نشده است."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "bank-loans",
+      "name_fa": "استعلام تسهیلات بانکی",
+      "category": "banking",
+      "category_fa": "بانکی و ارزی",
+      "source_url": "https://pishkhan24.com/bank-loans/",
+      "description": "استعلام تسهیلات بانکی؛ پرداخت اقساط در این خدمت فراهم نیست.",
+      "keywords": [
+        "bank loans",
+        "استعلام تسهیلات بانکی"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          },
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "شماره موبایل و کد ملی؛ پرداخت اقساط فراهم نیست",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "پرداخت اقساط در این خدمت فراهم نیست."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "posttracking",
+      "name_fa": "پیگیری مرسوله پستی",
+      "category": "postal",
+      "category_fa": "پستی",
+      "source_url": "https://pishkhan24.com/posttracking/",
+      "description": "استعلام پولی رهگیری مرسوله پستی و وضعیت ارسال با کد رهگیری.",
+      "keywords": [
+        "posttracking",
+        "پیگیری مرسوله پستی"
+      ],
+      "capability_kind": "paid_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "tracking_code": {
+            "type": "string",
+            "title": "کد رهگیری",
+            "description": "کد رهگیری مرسوله پستی به صورت رشته."
+          }
+        },
+        "required": [
+          "tracking_code"
+        ],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد رهگیری؛ هزینه استعلام؛ نتیجه شامل فرستنده/گیرنده و وضعیت",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "paid",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "استعلام هزینه دارد و می‌تواند اطلاعات فرستنده و گیرنده برگرداند."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "passport",
+      "name_fa": "گذرنامه",
+      "category": "postal",
+      "category_fa": "پستی",
+      "source_url": "https://pishkhan24.com/passport/",
+      "description": "پیگیری وضعیت گذرنامه.",
+      "keywords": [
+        "passport",
+        "گذرنامه"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "postal-address-lookup",
+      "name_fa": "دریافت آدرس با کدپستی",
+      "category": "postal",
+      "category_fa": "پستی",
+      "source_url": "https://pishkhan24.com/postal-address-lookup/",
+      "description": "دریافت آدرس متناظر با کدپستی؛ قرارداد دقیق ورودی نیازمند تأیید است.",
+      "keywords": [
+        "postal address lookup",
+        "دریافت آدرس با کدپستی"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "military-card",
+      "name_fa": "کارت پایان خدمت",
+      "category": "postal",
+      "category_fa": "پستی",
+      "source_url": "https://pishkhan24.com/military-card/",
+      "description": "پیگیری وضعیت کارت پایان خدمت.",
+      "keywords": [
+        "military card",
+        "کارت پایان خدمت"
+      ],
+      "capability_kind": "inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {},
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": null,
+      "requirements_status": "unknown",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "transaction-check",
+      "name_fa": "اعتبار معاملاتی افراد",
+      "category": "judicial",
+      "category_fa": "قوه قضائیه",
+      "source_url": "https://pishkhan24.com/transaction-check/",
+      "description": "استعلام اعتبار معاملاتی افراد؛ ورودی‌های فرم و توضیح عمومی نیازمند تطبیق هستند.",
+      "keywords": [
+        "transaction check",
+        "اعتبار معاملاتی افراد"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "mobile": {
+            "type": "string",
+            "title": "شماره موبایل",
+            "description": "شماره موبایل شخص مربوط به خدمت؛ قرارداد مالکیت و قالب نهایی توسط تأمین‌کننده تعیین می‌شود."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "فرم کد ملی؛ متن کد ملی+موبایل؛ نیازمند رفع ابهام با API",
+      "requirements_status": "ambiguous",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "فرم کد ملی و متن کد ملی همراه موبایل را ذکر می‌کنند؛ قرارداد واقعی باید تعیین‌کننده باشد."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    },
+    {
+      "id": "reputation-check",
+      "name_fa": "استعلام حسن شهرت",
+      "category": "judicial",
+      "category_fa": "قوه قضائیه",
+      "source_url": "https://pishkhan24.com/reputation-check/",
+      "description": "استعلام وضعیت حسن شهرت؛ این مدخل صدور گواهی را شامل نمی‌شود.",
+      "keywords": [
+        "reputation check",
+        "استعلام حسن شهرت"
+      ],
+      "capability_kind": "sensitive_inquiry",
+      "input_schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "description": "Normalized agent-facing fields observed in public pages. This is not a verified upstream API request schema.",
+        "properties": {
+          "national_id": {
+            "type": "string",
+            "title": "کد ملی",
+            "description": "شناسه ملی به صورت رشته برای حفظ صفر ابتدایی."
+          },
+          "birth_date": {
+            "type": "string",
+            "title": "تاریخ تولد",
+            "description": "تاریخ تولد همراه با قالب و تقویم تأییدشده توسط تأمین‌کننده."
+          }
+        },
+        "required": [],
+        "additionalProperties": true,
+        "x-contract-status": "unverified_public_form"
+      },
+      "observed_inputs": "کد ملی و تاریخ تولد؛ پیگیری وضعیت بدون صدور گواهی",
+      "requirements_status": "observed_public_form",
+      "cost_mode": "unknown",
+      "cost_scope": "inquiry_or_purchase",
+      "requires_account": true,
+      "account_requirement_basis": "Provisional local execution policy; upstream account requirement is not verified. A false value does not guarantee anonymous upstream execution.",
+      "account_requirement_verified": false,
+      "workflow_actions": [
+        "requirements",
+        "quote",
+        "execute",
+        "status"
+      ],
+      "variants": [],
+      "limitations": [
+        "پیگیری وضعیت؛ صدور گواهی در این خدمت تأیید نشده است."
+      ],
+      "capability_status": "catalogued_requires_adapter",
+      "api_contract_verified": false,
+      "evidence": {
+        "kind": "official_public_page",
+        "reviewed_at": "2026-11-16",
+        "authenticated_execution_tested": false,
+        "notes": "Public product and form evidence; endpoint, request envelope, pricing and live behavior require a verified provider contract."
+      }
+    }
+  ]
+}

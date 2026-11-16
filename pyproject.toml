@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pishkhan-mcp"
+version = "0.1.0"
+description = "Django application and MCP server for Pishkhan24 workflows"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "Django>=5.2,<5.3",
+  "mcp==2.3.0",
+  "uvicorn>=0.30,<1",
+  "httpx>=0.28,<1",
+  "starlette>=0.40,<2",
+  "python-dotenv>=1,<2",
+  "jsonschema>=4.23,<5",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.2,<4"]
+dev = ["pytest>=8,<10", "pytest-django>=4.9,<5", "pytest-asyncio>=0.24,<2", "ruff>=0.11,<1"]
+
+[tool.setuptools.packages.find]
+include = ["apps*", "config*"]
+
+[tool.setuptools.package-data]
+"apps.catalog" = ["data/*.json"]
+"apps.providers" = ["data/*.json"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+exclude = ["apps/core/migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

@@ -1,0 +1,32 @@
+name: Offline test bundle
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/offline-bundle.yml'
+      - 'requirements.lock'
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.13'
+      - name: Package tracked source and locked test dependencies
+        run: |
+          mkdir -p bundle/wheels
+          git archive --format=zip --output=bundle/source.zip HEAD
+          python -m pip download --only-binary=:all: -r requirements.lock -d bundle/wheels
+          git rev-parse HEAD > bundle/COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pishkhan-offline-linux-py313
+          path: bundle/
+          retention-days: 3
+          if-no-files-found: error

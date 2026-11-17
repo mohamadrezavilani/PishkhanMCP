@@ -6,6 +6,10 @@ on:
     paths:
       - '.github/workflows/offline-bundle.yml'
       - 'requirements.lock'
+      - 'apps/**'
+      - 'config/**'
+      - 'tests/**'
+      - 'templates/**'
 
 permissions:
   contents: read

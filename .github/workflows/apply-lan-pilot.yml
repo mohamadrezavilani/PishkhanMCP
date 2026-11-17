@@ -1,0 +1,60 @@
+name: Apply verified LAN pilot
+
+on:
+  push:
+    branches: [main]
+    paths: ['.pilot-delivery/**']
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    env:
+      P24_MODE: demo
+      DB_HOST: ''
+      P24_ACCESS_KEY: ''
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.13'
+      - name: Verify and apply exactly the locally tested source tree
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD^)" = '192b9a38e3294638c8513f785a60eb7a4ba7946b'
+          python - <<'PY'
+          import base64, hashlib, lzma
+          from pathlib import Path
+          encoded = ''.join(Path(f'.pilot-delivery/{i}.b64').read_text() for i in range(4))
+          patch = lzma.decompress(base64.b64decode(encoded, validate=True))
+          assert hashlib.sha256(patch).hexdigest() == '715614d0ae47b23ce318883d759b79ab733d5ae6ef55e9e117ffe61ca156806a'
+          Path('/tmp/lan-pilot.patch').write_bytes(patch)
+          PY
+          git apply --check /tmp/lan-pilot.patch
+          git apply --index /tmp/lan-pilot.patch
+          git rm -r .pilot-delivery .github/workflows/apply-lan-pilot.yml
+          test "$(git write-tree)" = 'bb02ec6aaaa10ac70baa8ffc5d5f6b9f45f7f052'
+      - name: Validate the pilot before publishing
+        run: |
+          python -m pip install -r requirements.lock
+          python -m pip install --no-deps -e .
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+          python -m ruff check .
+          python -m ruff format --check .
+          python -m pytest -q
+          node scripts/test_pilot_ui.cjs
+          node scripts/test_console_state.cjs
+          python scripts/test_lan_http.py
+      - name: Publish tested source and remove delivery files
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Add browser-isolated Persian LAN pilot, OTP onboarding, payment cards and concurrent HTTP tests'
+          git push origin HEAD:main

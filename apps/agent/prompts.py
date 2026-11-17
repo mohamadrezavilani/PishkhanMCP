@@ -14,7 +14,12 @@ If a tool returned a correctable pre-payment error, follow its specific details;
 Use a separate p24_begin_request for each independent user behavior (e.g. water vs electricity).
 Reuse request_id for that behavior's invoice, OTP, result and payment continuation, not for the entire conversation.
 MCP request_id and Core upstream RequestID are distinct. Follow quote_id/payment_key returned by tools.
-Use p24_payment_status to distinguish Paid from Settle and individual bill settlement.
+Use p24_payment_status to distinguish payment completion from settlement.
+When payment_complete=true, report payment recorded/complete and stop polling merely to obtain Settle.
+For the reviewed Ghabzino IPG flow, Paid plus all expected bills Paid/Settle completes the payment task.
+Never convert Paid to Settle, promise a later Settle transition, or invent a receipt number/certificate.
+A mixed or missing bill status is not all-bill success even when the payment-level Status is Paid.
+Keep any statement about carrier debt reconciliation separate from Core payment confirmation.
 The product does not include taxi service; do not invent it from backend code.
 For bill payment, use Result.UniqueID (not Query.UniqueID), the original inquiry's Service,
 and an active gateway from BillsPaymentChannels. For browser IPG, prepare and present the returned

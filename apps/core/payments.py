@@ -13,19 +13,9 @@ from django.utils import timezone
 
 from apps.core.errors import PishkhanError
 from apps.core.models import Operation, PaymentAttempt, ProviderCall, Quote
+from apps.core.payment_progress import payment_progress
 from apps.core.tracing import current_request, ensure_request
 from apps.providers.registry import find_action
-
-PAYMENT_STATES = {
-    "Unknown": "unknown",
-    "Undefined": "unknown",
-    "Unpaid": "requires_user_action",
-    "Paid": "paid_waiting_settlement",
-    "InProcess": "processing",
-    "Settle": "settled",
-    "Return": "returned",
-    "Unpayable": "unpayable",
-}
 
 
 def gateway_flow(gateway):
@@ -81,7 +71,7 @@ def payment_status(session_id, payment_key):
     response = ops.live_call(session, find_action("PaymentInfo", "core"), {"PaymentKey": payment_key})
     attempt.refresh_from_db()
     status = attempt.status
-    financial_state = PAYMENT_STATES.get(status, "unknown")
+    progress = payment_progress(attempt)
     # This enables result retrieval, not a claim that the service was delivered.
     if attempt.purchase_key and status in {"Paid", "Settle"}:
         for quote in Quote.objects.filter(session=session, parameters__purchase_key=attempt.purchase_key):
@@ -96,34 +86,36 @@ def payment_status(session_id, payment_key):
     for operation in [*origin, *targets]:
         operation.status = (
             Operation.Status.COMPLETED
-            if status == "Settle"
+            if progress["payment_complete"]
             else Operation.Status.FAILED
             if status in {"Return", "Unpayable"}
             else Operation.Status.REQUIRES_ACTION
             if status == "Unpaid"
             else Operation.Status.PENDING
-            if status in {"Paid", "InProcess"}
+            if status in {"Paid", "Settle", "InProcess"}
             else Operation.Status.UNKNOWN
         )
         operation.result = {
             **operation.result,
-            "financial_state": financial_state,
+            **progress,
             "payment_key": payment_key,
         }
+        if progress["payment_complete"]:
+            operation.result["next_step"] = "none"
         operation.save(update_fields=["status", "result", "updated_at"])
     data = response.get("parameters", {})
     return {
         **attempt.public_dict(),
-        "financial_state": financial_state,
+        **progress,
         "transaction_details": data.get("ExtraInfo") if isinstance(data, dict) else None,
         "amount": data.get("Amount") if isinstance(data, dict) else None,
         "fee": data.get("Fee") if isinstance(data, dict) else None,
         "total_amount": data.get("TotalAmount") if isinstance(data, dict) else None,
         "currency": "IRR",
-        "requires_user_action": status == "Unpaid",
-        "pending": financial_state in {"unknown", "processing", "paid_waiting_settlement"},
         "authority": "core.svc/v1/PaymentInfo",
-        "notice": "Paid is not Settle; inspect individual bill statuses. A browser return is not evidence of payment.",
+        "notice": "payment_complete ends the verified payment task, not carrier reconciliation. "
+        "settled reflects only the raw payment Settle state; inspect all bill states separately. "
+        "Paid does not guarantee a later Settle transition. Do not pay again to check status.",
     }
 
 
@@ -151,7 +143,7 @@ def _finish_start(session, result, gateway):
             payload["financial_state"] = payload["payment_state"]["financial_state"]
         except PishkhanError as exc:
             payload["status_error"] = exc.as_dict()["error"]
-        payload["pending"] = payload["financial_state"] != "settled"
+        payload["pending"] = payload.get("payment_state", {}).get("pending", True)
     else:
         payload["requires_user_action"] = True
     payload["next_step"] = (
@@ -380,7 +372,7 @@ def cnpg(session_id, payment_key, encrypted_data, idempotency_key, *, pay=False)
                 **response,
                 "payment_key": payment_key,
                 "payment_state": state,
-                "pending": not state["settled"],
+                "pending": state["pending"],
             }
         except PishkhanError as exc:
             return {

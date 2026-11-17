@@ -16,6 +16,8 @@ from typing import Any
 
 from apps.product_scope import EXCLUDED_SERVICES, SCOPE_NOTE
 
+_MOBILE_SEARCH_ALIASES = "mobile cellphone \u0645\u0648\u0628\u0627\u06cc\u0644 \u062a\u0644\u0641\u0646 \u0647\u0645\u0631\u0627\u0647"
+
 
 class UnknownServiceError(KeyError):
     """The supplied identifier is not a catalog service."""
@@ -78,6 +80,8 @@ def list_services(
                 [service["id"], service["name_fa"], service["description"]] + service.get("keywords", [])
             )
         )
+        if service["id"] in {"mci", "irancell", "rightel"}:
+            haystack += " " + _search_text(_MOBILE_SEARCH_ALIASES)
         words = re.findall(r"[\w-]+", haystack)
         if not all(any(word.startswith(token) for word in words) for token in tokens):
             continue

@@ -11,5 +11,7 @@ urlpatterns = [
     path("api/actions/", views.action_list),
     path("api/operations/", views.operation_list),
     path("api/chat/", views.chat),
+    path("api/conversations/", views.conversations),
+    path("api/conversations/<uuid:conversation_id>/", views.conversation_history),
     path("payments/return/", views.payment_return),
 ]

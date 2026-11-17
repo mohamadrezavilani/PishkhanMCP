@@ -612,3 +612,67 @@ def cnpg_request_otp(session_id, payment_key, encrypted_data, idempotency_key):
 )
 def cnpg_payment(session_id, payment_key, encrypted_data, idempotency_key):
     return payments.cnpg(session_id, payment_key, encrypted_data, idempotency_key, pay=True)
+
+
+@tool(
+    "p24_mobile_bill",
+    "Mobile bill inquiry by phone and operator. mci is Hamrah Aval. Returns quote_id; follow p24_run_inquiry when ready. No payment.",
+    {
+        "session_id": SESSION,
+        "phone": S,
+        "operator": {"type": "string", "enum": ["mci", "irancell", "rightel"]},
+        "idempotency_key": KEY,
+    },
+    ["session_id", "phone", "operator", "idempotency_key"],
+)
+def mobile_bill(session_id, phone, operator, idempotency_key):
+    return ops.prepare_inquiry(
+        session_id,
+        "services_cell_phone_bills_v1",
+        {"LineNumber": ops.digits(phone), "Operator": operator},
+        idempotency_key,
+    )
+
+
+@tool(
+    "p24_recent_bills",
+    "Recover previous bill results from this session even in a new chat. No new inquiry. Returns BillUniqueID, request_id, Service, amount and observation time. Check before asking the user for bill/payment IDs.",
+    {
+        "session_id": SESSION,
+        "service_id": S,
+        "phone": S,
+        "offset": {"type": "integer", "minimum": 0},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 50},
+    },
+    ["session_id"],
+    read_only=True,
+)
+def recent_bills(session_id, service_id=None, phone=None, offset=0, limit=10):
+    from apps.core.bills import recent_bills as recover
+
+    return recover(session_id, service_id, phone, offset, limit)
+
+
+@tool(
+    "p24_bill_payment_options",
+    "Discover actual active gateways for stored bills. IPG is a flow, not a gateway name. Read-only; no payment created.",
+    {"session_id": SESSION, "bill_ids": {"type": "array", "items": S, "minItems": 1}},
+    ["session_id", "bill_ids"],
+    read_only=True,
+)
+def bill_payment_options(session_id, bill_ids):
+    from apps.core.bills import bill_payment_options as discover
+
+    return discover(session_id, bill_ids)
+
+
+@tool(
+    "p24_bill_payment_link",
+    "Create only a browser IPG link for the selected stored BillUniqueIDs. Automatically discovers an active online gateway, preserves the original request and queries PaymentInfo for amount/fee/total. Never uses wallet or CNPG. Use p24_recent_bills first; no paper BillID/PaymentID required. Does not pay the bill.",
+    {"session_id": SESSION, "bill_ids": {"type": "array", "items": S, "minItems": 1}, "idempotency_key": KEY},
+    ["session_id", "bill_ids", "idempotency_key"],
+)
+def bill_payment_link(session_id, bill_ids, idempotency_key):
+    from apps.core.bills import bill_payment_link as prepare_link
+
+    return prepare_link(session_id, bill_ids, idempotency_key)

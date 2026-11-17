@@ -145,3 +145,51 @@ def chat(request):
 @require_GET
 def payment_return(request):
     return render(request, "payment_return.html")
+
+
+@require_GET
+@api_access
+def conversations(request):
+    from apps.core.models import Conversation
+
+    session = get_session(request.GET.get("session_id", ""))
+    rows = Conversation.objects.filter(session=session).order_by("-updated_at", "-id")[:30]
+    return respond(
+        {
+            "ok": True,
+            "items": [
+                {
+                    "conversation_id": str(row.pk),
+                    "updated_at": row.updated_at.isoformat(),
+                    "message_count": len(row.messages),
+                    "preview": next(
+                        (
+                            str(m.get("content") or "")[:120]
+                            for m in reversed(row.messages)
+                            if m.get("role") == "user"
+                        ),
+                        "",
+                    ),
+                }
+                for row in rows
+            ],
+        }
+    )
+
+
+@require_GET
+@api_access
+def conversation_history(request, conversation_id):
+    from apps.agent.redaction import redact
+    from apps.core.models import Conversation
+
+    session = get_session(request.GET.get("session_id", ""))
+    row = Conversation.objects.filter(session=session, pk=conversation_id).first()
+    if row is None:
+        return respond({"ok": False, "error": {"code": "conversation_not_found"}}, status=404)
+    messages = [
+        {"role": m["role"], "content": m.get("content") or ""}
+        for m in row.messages
+        if m.get("role") in {"user", "assistant"} and m.get("content")
+    ]
+    return respond({"ok": True, "conversation_id": str(row.pk), "messages": redact(messages)})

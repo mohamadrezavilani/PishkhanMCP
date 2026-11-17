@@ -280,6 +280,109 @@
       "parameter_evidence": [],
       "response_notes": "PaymentInfo.Status.Name uses Unknown, Undefined, Unpaid, Paid, InProcess, Settle, Return, Unpayable. CNPG requires session-key encrypted EncryptData from the existing trusted client.",
       "status": "source_verified"
+    },
+    {
+      "id": "services_cell_phone_bills_v1",
+      "group": "services",
+      "path": "v1/CellPhoneBills",
+      "title_fa": "CellPhoneBills",
+      "description": "Observed website action CellPhoneBills. Input schema is partial unless schema_completeness is complete; use the returned upstream prerequisites and invoice/payment flow.",
+      "service_ids": [
+        "irancell",
+        "mci",
+        "rightel"
+      ],
+      "frontend_service_names": [
+        "v1_InquiryCellPhoneBills"
+      ],
+      "requires_auth": true,
+      "requires_session": true,
+      "effect": "unknown",
+      "parameters_schema": {
+        "type": "object",
+        "properties": {
+          "LineNumber": {
+            "type": "string",
+            "pattern": "^09[0-9]{9}$"
+          },
+          "Operator": {
+            "type": "string",
+            "enum": [
+              "Mci",
+              "Irancell",
+              "Rightel"
+            ]
+          },
+          "PurchaseKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "LineNumber",
+          "Operator",
+          "PurchaseKey"
+        ],
+        "additionalProperties": false
+      },
+      "schema_completeness": "complete",
+      "evidence": {
+        "kind": "company_source",
+        "source": "core-main/Core/Intermediate/Modules/Services/Telecom/Commands/Bills/CellPhone/CellPhoneBillsCommand.cs",
+        "reviewed_at": "2026-11-17",
+        "sha256": "d2429cbeeaef0f1aa4c8aab5ec88a786ef2f1b2f9b7df3bc4ac14533c543e946"
+      },
+      "parameter_evidence": [
+        {
+          "source": "https://pishkhan24.com/_nuxt/sTHIisM_.js",
+          "fields": [
+            "PurchaseKey"
+          ],
+          "kind": "observed_request_object"
+        },
+        {
+          "source": "https://pishkhan24.com/_nuxt/YIVmovca.js",
+          "fields": [
+            "PurchaseKey"
+          ],
+          "kind": "observed_request_object"
+        },
+        {
+          "source": "https://pishkhan24.com/_nuxt/gLM1JJZ8.js",
+          "fields": [
+            "LineNumber",
+            "Operator",
+            "PurchaseKey"
+          ],
+          "kind": "observed_request_object"
+        }
+      ],
+      "response_notes": "CellPhoneBillsModel and Command validate LineNumber, Operator and PurchaseKey. Handler returns a bill array; ExtraInfo.Final distinguishes final and mid-term bills. Source-verified, not a fresh live test.",
+      "status": "source_verified",
+      "service_mapping_note": "Observed static import chain from the route component to endpoint module.",
+      "invoice_input_schema": {
+        "type": "object",
+        "properties": {
+          "LineNumber": {
+            "type": "string",
+            "pattern": "^09[0-9]{9}$"
+          },
+          "Operator": {
+            "type": "string",
+            "enum": [
+              "Mci",
+              "Irancell",
+              "Rightel"
+            ]
+          }
+        },
+        "required": [
+          "LineNumber",
+          "Operator"
+        ],
+        "additionalProperties": false
+      },
+      "workflow_mapping": "endpoint_specific_verified"
     }
   ]
 }

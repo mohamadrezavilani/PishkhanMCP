@@ -13,6 +13,7 @@ from apps.core.tracing import current_request, ensure_request, operation_scope, 
 from apps.providers import demo
 from apps.providers.client import PishkhanClient, password_digest, redact
 from apps.providers.registry import find_action, get_action, registry, validate_parameters
+from apps.providers.service_mapping import normalize_inputs, resolve_service
 
 DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
 
@@ -136,6 +137,7 @@ def _update_account(session, action, parameters, response):
 
 
 def live_call(session, action, parameters):
+    parameters = normalize_inputs(action, parameters)
     validate_parameters(action, parameters)
     if action.get("requires_session", action.get("requires_auth", False)) and not session.token:
         raise PishkhanError("DEVICE_SESSION_REQUIRED", "ابتدا نشست پیشخوان را ایجاد یا وارد کنید.")
@@ -247,6 +249,7 @@ def login(session_id, phone, *, otp=None, password=None, idempotency_key):
 def execute_action(session_id, action_id, parameters, idempotency_key):
     session = get_session(session_id)
     action = get_action(action_id)
+    parameters = normalize_inputs(action, parameters)
     validate_parameters(action, parameters)
     if session.mode != "live":
         raise PishkhanError(
@@ -259,7 +262,7 @@ def execute_action(session_id, action_id, parameters, idempotency_key):
         parameters,
         idempotency_key,
         lambda: live_call(session, action, parameters),
-        service_id=next(iter(action.get("service_ids", [])), ""),
+        service_id=resolve_service(action, parameters, current_request()),
     )
 
 
@@ -415,6 +418,8 @@ def prepare_inquiry(session_id, action_id, parameters, idempotency_key, service_
         raise PishkhanError("LIVE_ACTION_ONLY", "برای نمونه از p24_quote_parcel_inquiry استفاده کنید.")
     if not isinstance(parameters, dict):
         raise PishkhanError("INVALID_PARAMETERS", "ورودی استعلام باید یک object باشد.")
+    parameters = normalize_inputs(action, parameters)
+    resolve_service(action, parameters, current_request())
     if action.get("invoice_input_schema"):
         validate_parameters({"parameters_schema": action["invoice_input_schema"]}, parameters)
     names = action.get("frontend_service_names", [])
@@ -448,7 +453,7 @@ def prepare_inquiry(session_id, action_id, parameters, idempotency_key, service_
         quote = Quote.objects.create(
             request=current_request(),
             session=session,
-            service_id=next(iter(action.get("service_ids", [])), ""),
+            service_id=resolve_service(action, parameters, current_request()),
             action_id=action_id,
             parameters={
                 "input": parameters,
@@ -471,7 +476,7 @@ def prepare_inquiry(session_id, action_id, parameters, idempotency_key, service_
         wire,
         idempotency_key,
         perform,
-        service_id=next(iter(action.get("service_ids", [])), ""),
+        service_id=resolve_service(action, parameters, current_request()),
     )
 
 

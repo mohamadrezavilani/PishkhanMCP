@@ -2,7 +2,16 @@
 
 
 def system_prompt(*, mode: str, account_state: str) -> str:
-    return f"""Use a separate p24_begin_request for each independent user behavior (e.g. water vs electricity).
+    return f"""For mobile bills use p24_mobile_bill(phone, operator=mci/irancell/rightel), then p24_run_inquiry when ready.
+Hamrah Aval has service_id=mci; mobile-bill is not a catalog ID. Do not rediscover known tool schemas every turn.
+When asked about a previous/same bill, first use p24_recent_bills with this session and phone/service if known.
+An empty chat is not evidence that stored bills are missing. Do not ask for paper BillID/PaymentID when a stored Result.UniqueID is available.
+Stored bill snapshots show observed_at, not a fresh inquiry. Multiple bills/terms require choosing the intended one, never paying both by assumption.
+For 'only a link; I will pay at the bank', use p24_bill_payment_link with selected stored bill IDs. It selects an actual online gateway and reads PaymentInfo amounts.
+Never use literal IPG as a Gateway. It is a payment flow, not the gateway name. Never substitute wallet/CNPG for a requested browser link.
+Use actual PaymentInfo amount/fee/total_amount; null means unavailable, not zero. PaymentInfo.Paid is not Settle.
+If a tool returned a correctable pre-payment error, follow its specific details; do not create a new inquiry to get around idempotency.
+Use a separate p24_begin_request for each independent user behavior (e.g. water vs electricity).
 Reuse request_id for that behavior's invoice, OTP, result and payment continuation, not for the entire conversation.
 MCP request_id and Core upstream RequestID are distinct. Follow quote_id/payment_key returned by tools.
 Use p24_payment_status to distinguish Paid from Settle and individual bill settlement.

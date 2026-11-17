@@ -370,6 +370,28 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
                 "تعداد مراحل این نوبت به سقف رسید؛ عملیات موجود را با شناسه آن پیگیری کنید.",
             )
 
+    progress = {"request_ids": [], "operation_ids": [], "quote_ids": [], "last_tool_error": None}
+    for entry in trace:
+        value = entry.get("result", {})
+        inner = value.get("result", {}) if isinstance(value.get("result"), dict) else {}
+        for field, plural in (
+            ("request_id", "request_ids"),
+            ("operation_id", "operation_ids"),
+            ("quote_id", "quote_ids"),
+        ):
+            identifier = value.get(field) or inner.get(field)
+            if identifier and identifier not in progress[plural]:
+                progress[plural].append(identifier)
+        error = value.get("error") or inner.get("error")
+        progress["last_tool_error"] = {"tool": entry["name"], "error": error} if error else None
+    if failure and failure["error"]["code"] == "agent_step_limit":
+        failure["error"]["details"]["progress"] = progress
+        last = progress["last_tool_error"]
+        if last:
+            failure["error"]["message"] += (
+                " \u062e\u0637\u0627\u06cc \u0622\u062e\u0631 \u0627\u0628\u0632\u0627\u0631: "
+                + str(last["error"].get("code", "unknown"))
+            )
     secrets.update(collect_secrets(history))
     if failure:
         reply = failure["error"]["message"]
@@ -390,6 +412,7 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
         "steps": steps,
         "stop_reason": failure["error"]["code"] if failure else "completed",
         "agent_usage": usage,
+        "progress": redact(progress, secrets),
     }
     if failure:
         result["error"] = failure["error"]

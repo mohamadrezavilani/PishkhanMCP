@@ -116,6 +116,10 @@ def payment_status(session_id, payment_key):
         **attempt.public_dict(),
         "financial_state": financial_state,
         "transaction_details": data.get("ExtraInfo") if isinstance(data, dict) else None,
+        "amount": data.get("Amount") if isinstance(data, dict) else None,
+        "fee": data.get("Fee") if isinstance(data, dict) else None,
+        "total_amount": data.get("TotalAmount") if isinstance(data, dict) else None,
+        "currency": "IRR",
         "requires_user_action": status == "Unpaid",
         "pending": financial_state in {"unknown", "processing", "paid_waiting_settlement"},
         "authority": "core.svc/v1/PaymentInfo",
@@ -207,13 +211,11 @@ def pay_quote(session_id, quote_id, gateway, use_credit, idempotency_key):
 
 
 def _resume_callback_preflight(session, key, parameters, executor):
-    """Reclaim only the old local callback guard, never an attempted payment.
+    """Reclaim a proven pre-payment validation failure with a conditional UPDATE.
 
-    Prior versions reserved bill_payment before raising CALLBACK_NOT_CONFIGURED.
-    That exact preflight ran before any Core call. A conditional UPDATE lets only
-    one worker reclaim a matching reservation; a crash leaves RUNNING/UNKNOWN
-    non-retryable. Retain the original operation/request IDs. Changing the subject,
-    gateway, or service still follows execute_once's idempotency conflict rules.
+    CALLBACK_NOT_CONFIGURED still requires identical inputs and zero calls.
+    INVALID_GATEWAY may change only Gateway, and only when every recorded call
+    is a successful BillsPaymentChannels read. Never reclaim an uncertain charge.
     """
     from apps.core import operations as ops
 
@@ -225,12 +227,37 @@ def _resume_callback_preflight(session, key, parameters, executor):
     if not operation or operation.status != Operation.Status.FAILED:
         return None
     error = operation.result.get("error", {}) if isinstance(operation.result, dict) else {}
-    if not isinstance(error, dict) or error.get("code") != "CALLBACK_NOT_CONFIGURED":
+    reason = error.get("code") if isinstance(error, dict) else None
+    if reason not in {"CALLBACK_NOT_CONFIGURED", "INVALID_GATEWAY"}:
         return None
+    old_parameters = operation.request_data
+    old_raw = json.dumps(
+        {"action": "bill_payment", "parameters": old_parameters}, sort_keys=True, ensure_ascii=False
+    )
+    if operation.request_hash != hashlib.sha256(old_raw.encode()).hexdigest():
+        return None
+    if reason == "CALLBACK_NOT_CONFIGURED":
+        if old_parameters != parameters:
+            return None
+        disallowed_calls = ProviderCall.objects.filter(operation_id=operation.pk)
+    else:
+        if {k: v for k, v in old_parameters.items() if k != "Gateway"} != {
+            k: v for k, v in parameters.items() if k != "Gateway"
+        }:
+            return None
+        allowed = ProviderCall.objects.filter(
+            operation_id=operation.pk,
+            action_id="core_bills_payment_channels_v1",
+            status="succeeded",
+            upstream_code="G00000",
+        )
+        if not allowed.exists():
+            return None
+        disallowed_calls = ProviderCall.objects.filter(operation_id=operation.pk).exclude(
+            pk__in=allowed.values("pk")
+        )
     raw = json.dumps({"action": "bill_payment", "parameters": parameters}, sort_keys=True, ensure_ascii=False)
     fingerprint = hashlib.sha256(raw.encode()).hexdigest()
-    if operation.request_hash != fingerprint or operation.request_data != parameters:
-        return None
     if current_request() and operation.request_id and operation.request_id != current_request().pk:
         raise PishkhanError("REQUEST_MISMATCH", "This idempotency key belongs to another request.")
 
@@ -241,18 +268,30 @@ def _resume_callback_preflight(session, key, parameters, executor):
             pk=operation.pk,
             status=Operation.Status.FAILED,
             result=operation.result,
-            request_hash=fingerprint,
-            request_data=parameters,
+            request_id=operation.request_id,
+            request_hash=operation.request_hash,
+            request_data=old_parameters,
             upstream_reference="",
         )
-        .exclude(pk__in=ProviderCall.objects.filter(operation_id=operation.pk).values("operation_id"))
+        .exclude(pk__in=disallowed_calls.values("operation_id"))
         .exclude(pk__in=PaymentAttempt.objects.filter(operation_id=operation.pk).values("operation_id"))
     )
-    claimed = eligible.update(status=Operation.Status.RUNNING, updated_at=timezone.now())
+    claimed = eligible.update(
+        status=Operation.Status.RUNNING,
+        request_hash=fingerprint,
+        request_data=parameters,
+        updated_at=timezone.now(),
+    )
     operation.refresh_from_db()
     if not claimed:
         return ops._operation_response(operation, replayed=True)
-    return ops._complete_operation(operation, executor)
+
+    def resumed():
+        result = executor()
+        result["preflight_recovery"] = {"reason": reason, "previous_gateway": old_parameters.get("Gateway")}
+        return result
+
+    return ops._complete_operation(operation, resumed)
 
 
 def prepare_bill_payment(session_id, bill_ids, gateway, idempotency_key, service_name=None):

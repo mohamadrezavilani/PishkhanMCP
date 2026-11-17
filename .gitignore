@@ -22,3 +22,5 @@ build/
 private_inputs/
 logs_*.json.gz
 Viewer_Capacity_Inputs_*.zip
+
+.lan-secret

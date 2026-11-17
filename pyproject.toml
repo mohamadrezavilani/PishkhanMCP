@@ -28,6 +28,7 @@ include = ["apps*", "config*"]
 [tool.setuptools.package-data]
 "apps.catalog" = ["data/*.json"]
 "apps.providers" = ["data/*.json"]
+"apps.portal" = ["assets/*.css", "assets/*.js"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"

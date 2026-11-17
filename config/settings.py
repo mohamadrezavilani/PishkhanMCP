@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "apps.catalog",
     "apps.providers",
     "apps.agent",
+    "apps.portal",
     "apps.mcpserver",
 ]
 MIDDLEWARE = [
@@ -73,7 +74,7 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
-            "OPTIONS": {"timeout": 30},
+            "OPTIONS": {"timeout": 30, "transaction_mode": "IMMEDIATE"},
         }
     }
 
@@ -111,3 +112,11 @@ AGENT_TIMEOUT = float(os.getenv("AGENT_TIMEOUT", "90"))
 AGENT_PROXY_URL = os.getenv("AGENT_PROXY_URL", "").strip()
 AGENT_WORKSPACE_ID = os.getenv("AGENT_WORKSPACE_ID", "").strip()
 AGENT_DAILY_MESSAGE_LIMIT = int(os.getenv("AGENT_DAILY_MESSAGE_LIMIT", "10"))
+
+# LAN pilot: hide developer APIs/MCP from non-loopback peers.
+P24_LAN_MODE = flag("P24_LAN_MODE", False)
+AGENT_MAX_OUTPUT_TOKENS = int(os.getenv("AGENT_MAX_OUTPUT_TOKENS", "1200"))
+SESSION_COOKIE_NAME = "p24_browser"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_AGE = 43200

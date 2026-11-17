@@ -43,3 +43,12 @@ jobs:
           python -m ruff format --check .
       - name: Run tests
         run: python -m pytest -q
+
+      - name: Check browser-side scripts
+        run: |
+          node --check apps/portal/assets/pilot.js
+          node scripts/test_pilot_ui.cjs
+          node scripts/test_console_state.cjs
+
+      - name: Five-browser HTTP regression (synthetic only)
+        run: python scripts/test_lan_http.py

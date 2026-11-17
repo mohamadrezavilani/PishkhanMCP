@@ -1,3 +1,17 @@
+## Invited LAN pilot
+
+The consumer homepage is now `/`; the original technical console remains at
+`/console/`. Start the isolated LAN mode with the project virtualenv:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_lan.py --ip 192.168.1.20
+```
+
+Replace the example IP with this Windows computer's actual LAN IPv4.
+Read [LAN pilot setup and acceptance tests](docs/lan-pilot.md) before inviting users.
+No ChatGPT subscription or model API key is needed on client devices. The
+server's existing model configuration and shared ten-turn daily cap still apply.
+
 # PishkhanMCP
 
 Django + MCP integration for Pishkhan24, with a Persian local console, a shared

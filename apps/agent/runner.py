@@ -12,7 +12,6 @@ from urllib.parse import urlsplit
 import httpx
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
 from jsonschema import Draft202012Validator
@@ -196,28 +195,35 @@ def _reserve_daily_message() -> dict[str, Any] | None:
     if not isinstance(limit, int) or not 1 <= limit <= 1000:
         return {"error": "invalid_limit"}
     today = timezone.localdate()
-    with transaction.atomic():
-        usage, _ = AgentDailyUsage.objects.get_or_create(usage_date=today)
-        usage = AgentDailyUsage.objects.select_for_update().get(pk=usage.pk)
-        if usage.messages_used >= limit:
-            return {
-                "error": "daily_limit",
-                "limit": limit,
-                "used": usage.messages_used,
-                "remaining": 0,
-                "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
-            }
-        usage.messages_used += 1
-        usage.save(update_fields=["messages_used", "updated_at"])
+    usage, _ = AgentDailyUsage.objects.get_or_create(usage_date=today)
+    reserved = AgentDailyUsage.objects.filter(pk=usage.pk, messages_used__lt=limit).update(
+        messages_used=F("messages_used") + 1, updated_at=timezone.now()
+    )
+    usage.refresh_from_db()
+    if not reserved:
         return {
+            "error": "daily_limit",
             "limit": limit,
             "used": usage.messages_used,
-            "remaining": max(0, limit - usage.messages_used),
+            "remaining": 0,
             "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
         }
+    return {
+        "limit": limit,
+        "used": usage.messages_used,
+        "remaining": max(0, limit - usage.messages_used),
+        "resets_on": (today + timezone.timedelta(days=1)).isoformat(),
+    }
 
 
-def run_turn(session_id: str, message: str, conversation_id: str | None = None) -> dict[str, Any]:
+def run_turn(
+    session_id: str,
+    message: str,
+    conversation_id: str | None = None,
+    *,
+    tool_names: frozenset[str] | None = None,
+    extra_instructions: str = "",
+) -> dict[str, Any]:
     """Execute one user turn and return reply, trace, and continuation identifier.
 
     The same domain tools are used by MCP, REST, and this agent. No keyword or
@@ -266,12 +272,21 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
     if usage and usage.get("error"):
         return _error("agent_budget_configuration", "تنظیم سقف مصرف روزانه معتبر نیست.")
 
-    registry = {tool["name"]: tool for tool in _list_tools() if tool["name"] not in _SESSION_CREATORS}
+    registry = {
+        tool["name"]: tool
+        for tool in _list_tools()
+        if tool["name"] not in _SESSION_CREATORS and (tool_names is None or tool["name"] in tool_names)
+    }
     history = deepcopy(conversation.messages)
     history.append({"role": "user", "content": message})
     secrets = collect_secrets(history)
     model_messages = [
-        {"role": "system", "content": system_prompt(mode=session.mode, account_state=session.state)}
+        {
+            "role": "system",
+            "content": system_prompt(mode=session.mode, account_state=session.state)
+            + "\n"
+            + extra_instructions,
+        }
     ]
     model_messages.extend(history)
     model_tools = _model_tools(registry)
@@ -285,7 +300,11 @@ def run_turn(session_id: str, message: str, conversation_id: str | None = None) 
     with _make_client() as client:
         for step_number in range(1, max_steps + 1):
             steps = step_number
-            request = {"model": settings.AGENT_MODEL, "messages": model_messages}
+            request = {
+                "model": settings.AGENT_MODEL,
+                "messages": model_messages,
+                "max_tokens": settings.AGENT_MAX_OUTPUT_TOKENS,
+            }
             if model_tools:
                 request.update({"tools": model_tools, "tool_choice": "auto"})
             try:

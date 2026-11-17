@@ -269,6 +269,10 @@ def build_mcp_app(django_application: ASGIApp | None = None) -> Starlette:
     access_key = getattr(settings, "P24_ACCESS_KEY", "")
     if access_key:
         app.add_middleware(MCPAccessKeyMiddleware, access_key=access_key)
+    if getattr(settings, "P24_LAN_MODE", False):
+        from apps.portal.boundary import LANBoundary
+
+        app.add_middleware(LANBoundary)
     app.state.mcp_server = server
     return app
 

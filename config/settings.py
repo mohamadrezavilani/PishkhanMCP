@@ -111,7 +111,7 @@ AGENT_MAX_STEPS = int(os.getenv("AGENT_MAX_STEPS", "12"))
 AGENT_TIMEOUT = float(os.getenv("AGENT_TIMEOUT", "90"))
 AGENT_PROXY_URL = os.getenv("AGENT_PROXY_URL", "").strip()
 AGENT_WORKSPACE_ID = os.getenv("AGENT_WORKSPACE_ID", "").strip()
-AGENT_DAILY_MESSAGE_LIMIT = int(os.getenv("AGENT_DAILY_MESSAGE_LIMIT", "10"))
+AGENT_DAILY_MESSAGE_LIMIT = int(os.getenv("AGENT_DAILY_MESSAGE_LIMIT", "50"))
 
 # LAN pilot: hide developer APIs/MCP from non-loopback peers.
 P24_LAN_MODE = flag("P24_LAN_MODE", False)
@@ -120,3 +120,5 @@ SESSION_COOKIE_NAME = "p24_browser"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_AGE = 43200
+
+P24_AUTO_BILL_LINKS = flag("P24_AUTO_BILL_LINKS", True)

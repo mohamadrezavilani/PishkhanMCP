@@ -24,8 +24,18 @@ from apps.core.models import AccountSession, Conversation
 from apps.core.operations import digits
 from apps.core.tools import call_tool
 
+from .checkout import link_preparation_enabled, payment_keys, prepare_inquiry_links
 from .models import ChatTurn, Feedback, Visitor
-from .services import PILOT_PROMPT, PILOT_TOOLS, invoke, remember_payment, result_error, state
+from .services import (
+    PILOT_PROMPT,
+    PILOT_TOOLS,
+    invoke,
+    payment_cards,
+    remember_payment,
+    result_error,
+    state,
+    status_message,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -204,7 +214,26 @@ def history(request, visitor, conversation_id):
         for m in row.messages
         if m.get("role") in {"user", "assistant"} and m.get("content")
     ]
-    return respond({"ok": True, "conversation_id": str(row.pk), "messages": redact(messages)})
+    keys = set()
+    for m in row.messages:
+        if m.get("role") == "tool":
+            try:
+                keys.update(payment_keys(json.loads(m.get("content") or "{}")))
+            except (ValueError, TypeError):
+                pass
+    for turn in ChatTurn.objects.filter(visitor=visitor, response__conversation_id=str(row.pk)):
+        keys.update(turn.response.get("payment_keys", []))
+    # Rebuild from this account's current observations, not stale card snapshots.
+    cards = payment_cards(visitor, keys)
+    return respond(
+        {
+            "ok": True,
+            "conversation_id": str(row.pk),
+            "messages": redact(messages),
+            "payment_cards": cards,
+            "payment_keys": [c["payment_key"] for c in cards],
+        }
+    )
 
 
 @require_POST
@@ -227,9 +256,13 @@ def chat(request, visitor):
         and not Conversation.objects.filter(pk=conversation_id, session=visitor.account).exists()
     ):
         return failure("CONVERSATION_NOT_FOUND", "Conversation not found in this account.", 404)
-    fingerprint = hashlib.sha256(
-        json.dumps([message, conversation_id], ensure_ascii=False).encode()
-    ).hexdigest()
+    auto_link = payload.get("auto_payment_link", settings.P24_AUTO_BILL_LINKS)
+    if type(auto_link) is not bool:
+        return failure("INVALID_INPUT", "auto_payment_link must be a boolean.")
+    fingerprint_data = [message, conversation_id]
+    if "auto_payment_link" in payload:
+        fingerprint_data.append(auto_link)
+    fingerprint = hashlib.sha256(json.dumps(fingerprint_data, ensure_ascii=False).encode()).hexdigest()
     prior = ChatTurn.objects.filter(visitor=visitor, client_key=key).first()
     if prior:
         if prior.fingerprint != fingerprint:
@@ -243,7 +276,13 @@ def chat(request, visitor):
                 },
                 409,
             )
-        return respond({**prior.response, "replayed": True})
+        return respond(
+            {
+                **prior.response,
+                "payment_cards": payment_cards(visitor, set(prior.response.get("payment_keys", []))),
+                "replayed": True,
+            }
+        )
     try:
         with transaction.atomic():
             turn_id = uuid.uuid4()
@@ -261,7 +300,13 @@ def chat(request, visitor):
         # The unique client key won; never start a second model turn.
         prior = ChatTurn.objects.filter(visitor=visitor, client_key=key).first()
         if prior and prior.fingerprint == fingerprint and prior.state != "running":
-            return respond({**prior.response, "replayed": True})
+            return respond(
+                {
+                    **prior.response,
+                    "payment_cards": payment_cards(visitor, set(prior.response.get("payment_keys", []))),
+                    "replayed": True,
+                }
+            )
         return failure("TURN_RUNNING", "The original turn is already reserved.", 409)
     try:
         result = run_turn(
@@ -271,8 +316,16 @@ def chat(request, visitor):
             tool_names=PILOT_TOOLS,
             extra_instructions=PILOT_PROMPT,
         )
-        for entry in result.get("tool_calls", []):
+        trace = list(result.get("tool_calls", []))
+        for entry in trace:
             remember_payment(visitor, entry.get("result", {}))
+        automatic = prepare_inquiry_links(
+            visitor, trace, enabled=link_preparation_enabled(message, auto_link)
+        )
+        trace.extend(automatic["entries"])
+        keys = set(automatic["payment_keys"])
+        for entry in trace:
+            keys.update(payment_keys(entry.get("result", {})))
         response = {
             key: result[key]
             for key in ("ok", "reply", "conversation_id", "steps", "stop_reason", "error", "agent_usage")
@@ -284,8 +337,11 @@ def chat(request, visitor):
                 "ok": t.get("result", {}).get("ok", False),
                 "error_code": (result_error(t.get("result", {})) or {}).get("code"),
             }
-            for t in result.get("tool_calls", [])
+            for t in trace
         ]
+        response["payment_cards"] = payment_cards(visitor, keys)
+        response["payment_keys"] = [c["payment_key"] for c in response["payment_cards"]]
+        response["notices"] = automatic["notices"]
         response["turn_id"] = str(turn.pk)
         turn.state = "completed"
     except Exception as exc:
@@ -353,7 +409,19 @@ def payment_action(request, visitor):
     if not result.get("ok"):
         return respond({"ok": False, "error": result_error(result) or {"code": "PAYMENT_FAILED"}}, 400)
     visitor.refresh_from_db()
-    return respond(state(visitor))
+    update = state(visitor)
+    info = result.get("payment_info") or result
+    checked_key = info.get("payment_key") or result.get("result", {}).get("payment_key")
+    update["payment_update"] = {
+        "payment_key": checked_key,
+        "action": action,
+        "checked_at": timezone.now().isoformat(),
+        "message": status_message(info)
+        if action == "status"
+        else "\u0644\u06cc\u0646\u06a9 \u067e\u0631\u062f\u0627\u062e\u062a \u0622\u0645\u0627\u062f\u0647 \u0627\u0633\u062a\u061b \u0645\u0628\u0644\u063a \u0646\u0647\u0627\u06cc\u06cc \u0631\u0627 \u062f\u0631 \u06a9\u0627\u0631\u062a \u0628\u0628\u06cc\u0646\u06cc\u062f.",
+        "payment_complete": info.get("payment_complete", False),
+    }
+    return respond(update)
 
 
 @require_POST

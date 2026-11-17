@@ -20,7 +20,7 @@ machines. Only the host runs Django and holds the configured model credentials.
   reverse proxy that makes every remote user appear to be localhost.
 - CSRF applies to browser POSTs. Payment URLs are structured Core output, not
   model-generated HTML. Only HTTPS links without embedded credentials render.
-- Global model quota remains **10 user turns per Tehran calendar day for the
+- Global model quota defaults to **50 user turns per Tehran calendar day for the
   whole installation**, not ten per person. Login, saved-history reads and
   payment-status buttons do not call the model. Multiple model requests may be
   used within one turn. `AGENT_MAX_OUTPUT_TOKENS=1200` caps each model response;
@@ -68,7 +68,7 @@ Find the IPv4 address of the network adapter connected to the office LAN, **not*
 0.0.0.0, 127.0.0.1 or the default gateway/router. Example only: `192.168.1.20`.
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/run_lan.py --ip 192.168.1.20 --port 8000
+.\.venv\Scripts\python.exe scripts/run_lan.py --ip 192.168.1.20 --port 8000 --message-limit 50
 ```
 
 The launcher checks/migrates the DB and starts one Uvicorn worker bound to
@@ -76,7 +76,7 @@ The launcher checks/migrates the DB and starts one Uvicorn worker bound to
 and --no-proxy-headers for that process without overwriting `.env`. If the
 Django secret is still the sample, it creates a persistent ignored `.lan-secret`.
 Preserve that file across restarts to keep browser cookies valid. It never
-changes the global ten-message budget or silently switches live to demo.
+changes the configured message budget or silently switches live to demo.
 `--demo` explicitly selects synthetic Core behavior; the chat model still needs
 configuration. `--check-only` prints the addresses and checks/migrates without
 opening the listening port. Multiple detected IPs require an explicit --ip.
@@ -192,3 +192,9 @@ any tool or modify a financial outcome. Never use it while the worker is running
 References: Uvicorn settings, Django 5.2 sessions/CSRF and Microsoft's
 New-NetFirewallRule documentation were checked. This pilot is not a claim of
 production readiness or support for every catalog service.
+
+## Checkout interface update
+
+See [payment cards and automatic link preparation](portal-checkout.md). Existing
+`.env` values still win over defaults; the explicit `--message-limit 50` launcher
+option sets the effective shared daily cap without rewriting local secrets.

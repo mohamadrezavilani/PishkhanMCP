@@ -4,39 +4,38 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"><meta name="referrer" content="same-origin">
 <title>Pishkhan24 Assistant</title>
-<link rel="stylesheet" href="/portal-assets/pilot.css?v=lan1">
-<script defer src="/portal-assets/pilot.js?v=lan1"></script>
+<link rel="stylesheet" href="/portal-assets/pilot.css?v=lan2">
+<script defer src="/portal-assets/pilot.js?v=lan2"></script>
 </head>
-<body>
+<body data-auth="guest">
 <div hidden>{% csrf_token %}</div>
 <header class="topbar">
  <a class="brand" href="/" aria-label="Pishkhan24"><span class="mark">24</span><span><strong data-i18n="title">Pishkhan24</strong><small data-i18n="subtitle">LAN PILOT</small></span></a>
- <div class="header-actions"><span id="mode" class="pill">{{ mode }}</span><button id="connect" class="primary" data-i18n="connect"></button><button id="logout" class="quiet" hidden data-i18n="logout"></button></div>
+ <div class="header-actions"><div id="member" class="member" hidden><span class="avatar" aria-hidden="true">&#10003;</span><div><small data-i18n="accountLabel"></small><bdi id="user-phone" dir="ltr"></bdi></div></div><span id="mode" class="pill">{{ mode }}</span><button id="connect" class="primary" data-i18n="connect"></button><button id="logout" class="quiet" hidden data-i18n="logout"></button></div>
 </header>
 <div id="alert" class="alert" role="status" hidden></div>
 <div class="shell">
  <aside class="sidebar">
   <button id="new-chat" class="new-chat"><span>+</span><span data-i18n="newChat"></span></button>
-  <div class="section-label" data-i18n="conversations"></div><nav id="conversations" aria-label="Conversations"></nav>
+  <div class="section-label" data-i18n="conversations"></div><nav id="conversations" aria-label="Conversations"></nav><p id="history-empty" class="nav-empty"></p>
   <div class="sidebar-bottom"><div class="availability"><span class="dot"></span><span data-i18n="pilotScope"></span></div><p data-i18n="pilotNote"></p><div id="budget" class="budget"></div><button id="feedback-open" class="quiet" data-i18n="feedback"></button></div>
  </aside>
  <main>
   <section class="chat-panel" aria-label="Chat">
    <div class="chat-heading"><div><span class="eyebrow" data-i18n="workspace"></span><h1 id="chat-title" data-i18n="readyTitle"></h1></div><span id="account-state" class="account-state" data-i18n="notConnected"></span></div>
-   <div id="chatlog" class="chatlog" aria-live="polite">
-    <div id="welcome" class="welcome"><span class="spark" aria-hidden="true">&#10022;</span><h2 data-i18n="welcome"></h2><p data-i18n="intro"></p>
-     <div class="suggestions"><button data-example="mobile"><span class="icon">&#9742;</span><strong data-i18n="mobile"></strong><small data-i18n="mobileHint"></small></button><button data-example="electricity"><span class="icon">&#9889;</span><strong data-i18n="electricity"></strong><small data-i18n="electricityHint"></small></button><button data-example="water"><span class="icon">&#9678;</span><strong data-i18n="water"></strong><small data-i18n="waterHint"></small></button></div>
-    </div>
-   </div>
+   <div id="chatlog" class="chatlog" aria-live="polite"></div>
+   <section id="payment-focus" class="payment-focus" hidden aria-label="Payment cards"><h2 data-i18n="focusTitle"></h2><div id="chat-payments" class="cards"></div></section>
+   <div id="composer-area" hidden>
    <div id="busy" class="busy" role="status" hidden><span class="spinner"></span><span data-i18n="working"></span><span id="elapsed"></span></div>
+   <div class="auto-link-option"><label><input id="auto-link" type="checkbox" checked><span data-i18n="autoLink"></span></label><small data-i18n="autoLinkHint"></small></div>
    <form id="chat-form" class="composer"><label for="message" class="sr-only" data-i18n="message"></label><textarea id="message" rows="2" maxlength="4000" data-placeholder="placeholder"></textarea><button id="send" class="send" type="submit" data-i18n="send"></button></form>
-   <div class="composer-note" data-i18n="composerNote"></div>
+   <div class="composer-note" data-i18n="composerNote"></div></div>
   </section>
-  <section class="records-panel"><div class="records-heading"><div><span class="eyebrow" data-i18n="records"></span><h2 data-i18n="billsAndPayments"></h2></div><button id="refresh" class="quiet" data-i18n="refresh"></button></div><p class="muted" data-i18n="recordsNote"></p><div id="payments" class="cards"></div><div id="bills" class="cards"></div><div id="empty-records" class="empty" data-i18n="emptyRecords"></div></section>
+  <section id="records-section" class="records-panel" hidden><div class="records-heading"><div><span class="eyebrow" data-i18n="records"></span><h2 data-i18n="billsAndPayments"></h2></div><button id="refresh" class="quiet" data-i18n="refresh"></button></div><p class="muted" data-i18n="recordsNote"></p><div id="payments" class="cards"></div><div id="bills" class="cards"></div><div id="empty-records" class="empty" data-i18n="emptyRecords"></div></section>
  </main>
 </div>
 <footer><span data-i18n="footer"></span><span>PISHKHAN24 / PILOT 01</span></footer>
-<dialog id="login-dialog"><form id="login-form"><button type="button" id="login-close" class="dialog-close" aria-label="Close">&#215;</button><span class="eyebrow" data-i18n="account"></span><h2 data-i18n="loginTitle"></h2><p class="muted" data-i18n="loginNote"></p><label for="phone" data-i18n="phone"></label><input id="phone" inputmode="tel" autocomplete="tel" maxlength="11" dir="ltr" placeholder="09xxxxxxxxx" required>
+<dialog id="login-dialog"><form id="login-form"><button type="button" id="login-close" class="dialog-close" aria-label="Close">&#215;</button><span id="login-step" class="eyebrow" data-i18n="stepOne"></span><h2 data-i18n="loginTitle"></h2><p id="login-note" class="muted" data-i18n="loginNote"></p><label for="phone" data-i18n="phone"></label><input id="phone" inputmode="tel" autocomplete="tel" maxlength="11" dir="ltr" placeholder="09xxxxxxxxx" required>
 <div id="otp-row" hidden><label for="otp" data-i18n="otp"></label><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" dir="ltr"></div><div id="login-error" class="form-error" role="alert"></div><p id="demo-note" class="demo-note" hidden data-i18n="demoOtp"></p><button id="login-submit" class="primary full" type="submit" data-i18n="sendOtp"></button><button id="change-phone" class="quiet full" type="button" hidden data-i18n="changePhone"></button></form></dialog>
 <dialog id="feedback-dialog"><form id="feedback-form"><button type="button" id="feedback-close" class="dialog-close" aria-label="Close">&#215;</button><span class="eyebrow" data-i18n="pilotExperience"></span><h2 data-i18n="feedbackTitle"></h2><label for="rating" data-i18n="rating"></label><select id="rating"><option value="5">5 / 5</option><option value="4">4 / 5</option><option value="3">3 / 5</option><option value="2">2 / 5</option><option value="1">1 / 5</option></select><label for="comment" data-i18n="comment"></label><textarea id="comment" maxlength="2000" rows="4"></textarea><button class="primary full" type="submit" data-i18n="submitFeedback"></button></form></dialog>
 </body></html>

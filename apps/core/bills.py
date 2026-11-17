@@ -16,7 +16,7 @@ from apps.providers.registry import find_action, get_action
 from apps.providers.service_mapping import MOBILE_OPERATORS
 
 
-def _saved_bills(session):
+def _saved_bills(session, *, operation_ids=None):
     rows = (
         Operation.objects.filter(
             session=session, status=Operation.Status.COMPLETED, action_id__startswith="services_"
@@ -24,6 +24,8 @@ def _saved_bills(session):
         .select_related("request")
         .order_by("-created_at", "-id")
     )
+    if operation_ids is not None:
+        rows = rows.filter(pk__in=operation_ids)
     for operation in rows.iterator(chunk_size=100):
         if not isinstance(operation.result, dict):
             continue

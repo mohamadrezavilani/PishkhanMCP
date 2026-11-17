@@ -36,7 +36,14 @@ Use only the advertised high-level tools; do not search unavailable raw endpoint
 For a ready quote continue to p24_run_inquiry. Stop and explain any paid inquiry
 prerequisite; do not debit a wallet. Bank payments are completed by the human.
 Do not assume you can read browser history; recover previous bills with p24_recent_bills.
-A structured payment card displays the actual link. Never invent a link or receipt.
+After a successful bill inquiry, the portal automatically prepares an IPG link
+for a single positive unpaid bill. Do not ask for another user message to prepare
+it, and do not call link tools again after this fresh inquiry. Multiple payable
+terms require a selection. Explicit "inquiry only" or disabling the UI option
+prevents automatic link preparation. Never submit a payment or debit a wallet.
+A structured card displays the authoritative link and fees. DO NOT put payment
+URLs, Markdown links or HTML in your reply; point to the payment card instead.
+Never claim a link has succeeded before the structured result confirms it.
 Keep replies brief and in Persian. Report partial progress and a clear next action on errors.
 """
 
@@ -96,6 +103,7 @@ def state(visitor):
             "phone": account.phone if account else "",
         },
         "authenticated": authenticated,
+        "auto_payment_links": settings.P24_AUTO_BILL_LINKS,
         "agent_configured": bool(settings.AGENT_BASE_URL and settings.AGENT_MODEL),
         "usage": usage(),
         "busy": bool(visitor.active_turn),
@@ -115,20 +123,39 @@ def state(visitor):
         }
         for c in Conversation.objects.filter(session=account).order_by("-updated_at")[:30]
     ]
+    attempts = list(PaymentAttempt.objects.filter(session=account).order_by("-updated_at")[:30])
+    result["payments"] = payment_cards(visitor)
+    result["bills"] = recent_bills(str(account.pk), limit=20)["items"]
+    for b in result["bills"]:
+        related = next((p for p in attempts if b["bill_id"] in p.bill_ids), None)
+        if related:
+            b["payment_key"] = related.payment_key
+            b["current_payment_status"] = related.status
+            b["payment_complete"] = payment_progress(related)["payment_complete"]
+        # This is a stored observation; the UI must not call it a new inquiry.
+    return result
+
+
+def payment_cards(visitor, keys=None):
+    account = visitor.account
+    if not account or account.state != "authenticated":
+        return []
+    cards = []
     snapshots = {s.payment_key: s for s in PaymentSnapshot.objects.filter(visitor=visitor)}
-    attempts = list(
-        PaymentAttempt.objects.filter(session=account)
-        .select_related("operation")
-        .order_by("-updated_at")[:30]
-    )
+    attempts_query = PaymentAttempt.objects.filter(session=account).select_related("operation")
+    if keys is not None:
+        attempts_query = attempts_query.filter(payment_key__in=keys)
+    attempts = list(attempts_query.order_by("-updated_at")[:30])
     for p in attempts:
         progress = payment_progress(p)
         raw = p.operation.result if p.operation else {}
         snap = snapshots.get(p.payment_key)
         data = snap.data if snap else {}
-        result["payments"].append(
+        cards.append(
             {
                 "payment_key": p.payment_key,
+                "bill_ids": p.bill_ids,
+                "last_checked_at": snap.observed_at.isoformat() if snap else None,
                 "payment_status": p.status,
                 **progress,
                 "gateway": p.gateway,
@@ -143,15 +170,19 @@ def state(visitor):
                 else None,
             }
         )
-    result["bills"] = recent_bills(str(account.pk), limit=20)["items"]
-    for b in result["bills"]:
-        related = next((p for p in attempts if b["bill_id"] in p.bill_ids), None)
-        if related:
-            b["payment_key"] = related.payment_key
-            b["current_payment_status"] = related.status
-            b["payment_complete"] = payment_progress(related)["payment_complete"]
-        # This is a stored observation; the UI must not call it a new inquiry.
-    return result
+    if keys is not None:
+        cards = [card for card in cards if card["payment_key"] in keys]
+    return cards
+
+
+def status_message(info):
+    if info.get("payment_complete"):
+        return "\u067e\u0631\u062f\u0627\u062e\u062a \u062a\u0623\u06cc\u06cc\u062f \u0634\u062f. \u0646\u06cc\u0627\u0632\u06cc \u0628\u0647 \u067e\u0631\u062f\u0627\u062e\u062a \u0645\u062c\u062f\u062f \u0646\u06cc\u0633\u062a."
+    if info.get("payment_status") == "Unpaid":
+        return "\u0648\u0636\u0639\u06cc\u062a \u0627\u0632 \u067e\u06cc\u0634\u062e\u0648\u0627\u0646 \u062f\u0631\u06cc\u0627\u0641\u062a \u0634\u062f\u061b \u0647\u0646\u0648\u0632 \u067e\u0631\u062f\u0627\u062e\u062a\u06cc \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u062a\u0631\u0627\u06a9\u0646\u0634 \u062b\u0628\u062a \u0646\u0634\u062f\u0647 \u0627\u0633\u062a."
+    if info.get("payment_confirmed"):
+        return "\u067e\u0631\u062f\u0627\u062e\u062a \u062b\u0628\u062a \u0634\u062f\u0647 \u0627\u0633\u062a\u061b \u0646\u062a\u06cc\u062c\u0647 \u0647\u0645\u0647 \u0642\u0628\u0636\u200c\u0647\u0627 \u0647\u0646\u0648\u0632 \u0646\u0647\u0627\u06cc\u06cc \u0646\u06cc\u0633\u062a. \u067e\u0631\u062f\u0627\u062e\u062a \u0631\u0627 \u062a\u06a9\u0631\u0627\u0631 \u0646\u06a9\u0646\u06cc\u062f."
+    return "\u0648\u0636\u0639\u06cc\u062a \u062f\u0631\u06cc\u0627\u0641\u062a \u0634\u062f\u061b \u0646\u062a\u06cc\u062c\u0647 \u067e\u0631\u062f\u0627\u062e\u062a \u0647\u0646\u0648\u0632 \u0642\u0637\u0639\u06cc \u0646\u06cc\u0633\u062a. \u067e\u0631\u062f\u0627\u062e\u062a \u062c\u062f\u06cc\u062f \u0646\u0633\u0627\u0632\u06cc\u062f."
 
 
 def invoke(visitor, name, arguments):

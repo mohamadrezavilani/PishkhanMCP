@@ -32,6 +32,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ip", help="LAN IPv4 of THIS computer, not 0.0.0.0 or your router")
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--message-limit", type=int, help="Deployment-wide daily chat turn limit (1-1000)")
     parser.add_argument("--demo", action="store_true", help="Force synthetic Core/demo mode")
     parser.add_argument(
         "--check-only", action="store_true", help="Migrate/check and print URLs without serving"
@@ -39,6 +40,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if not 1 <= args.port <= 65535:
         parser.error("Port must be between 1 and 65535")
+    if args.message_limit is not None and not 1 <= args.message_limit <= 1000:
+        parser.error("--message-limit must be 1-1000")
     candidates = candidate_ips()
     ip = args.ip or (candidates[0] if len(candidates) == 1 else None)
     if not ip:
@@ -64,6 +67,8 @@ def main(argv=None):
             "DJANGO_CSRF_TRUSTED_ORIGINS": f"http://localhost:{args.port},http://127.0.0.1:{args.port},http://{ip}:{args.port}",
         }
     )
+    if args.message_limit is not None:
+        env["AGENT_DAILY_MESSAGE_LIMIT"] = str(args.message_limit)
     if args.demo:
         env["P24_MODE"] = "demo"
     if env.get("DJANGO_SECRET_KEY", "") in {
@@ -83,7 +88,11 @@ def main(argv=None):
     print(f"Pilot page for colleagues: http://{ip}:{args.port}/", flush=True)
     print(f"Local developer console: http://127.0.0.1:{args.port}/console/", flush=True)
     print(
-        "Mode: " + env.get("P24_MODE", "demo") + "; model budget unchanged; one worker; no proxy headers",
+        "Mode: "
+        + env.get("P24_MODE", "demo")
+        + "; daily shared message limit: "
+        + env.get("AGENT_DAILY_MESSAGE_LIMIT", "50")
+        + "; one worker; no proxy headers",
         flush=True,
     )
     print("Keep this terminal/computer running. Private/Domain firewall access may be required.", flush=True)
